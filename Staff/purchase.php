@@ -262,11 +262,6 @@
     <div class="row">
         <div>
             <label for="name">Name:</label>
-            <select id="title" name="title">
-                <option value="Mr.">Mr.</option>
-                <option value="Mrs.">Mrs.</option>
-                <option value="Miss">Miss</option>
-            </select>
             <input type="text" id="name" name="name" placeholder="Enter Name">
         </div>
         <div>
@@ -315,26 +310,42 @@
               for (let j = 0; j < 8; j++) { // 8 cells in each row
                   const cell = document.createElement('td');
                   cell.contentEditable = true;
-                  cell.addEventListener('input', updateDetails);
+
+                  // Add oninput event to the cells in the "Product Name" column
+                  if (j === 1) {
+                      const inputField = document.createElement('input');
+                      inputField.type = 'text';
+                      inputField.placeholder = 'Enter Product Name';
+                      inputField.addEventListener('input', function() {
+                          liveSearch(this);
+                      });
+                      cell.appendChild(inputField);
+                  }
+
                   row.appendChild(cell);
               }
 
               tbody.appendChild(row);
           }
 
-          function updateDetails(event) {
-              const productName = event.target.innerText.trim();
+          function liveSearch(inputField) {
+              const productName = inputField.value.trim();
+              const currentRow = inputField.parentNode.parentNode;
 
-              // Fetch details from the database using AJAX
+              // Fetch product details using AJAX
               if (productName !== '') {
-                  fetch('get_product_details.php?productName=' + encodeURIComponent(productName))
+                  fetch('get_medicine_details.php?productName=' + encodeURIComponent(productName))
                       .then(response => response.json())
                       .then(data => {
-                          const currentRow = event.target.parentNode;
-                          currentRow.cells[2].innerText = data.batchNo;
-                          currentRow.cells[3].innerText = data.expiryDate;
-                          currentRow.cells[4].innerText = data.mrp;
-                          currentRow.cells[5].innerText = data.rate;
+                          if (data.success) {
+                              currentRow.cells[2].innerText = data.productDetails.batchNo;
+                              currentRow.cells[3].innerText = data.productDetails.expiryDate;
+                              currentRow.cells[4].innerText = data.productDetails.unitPrice;
+                              currentRow.cells[5].innerText = data.productDetails.rate;
+                          } else {
+                              // Handle the case where the product is not found
+                              console.error('Product not found');
+                          }
                       })
                       .catch(error => console.error('Error fetching data:', error));
               }
