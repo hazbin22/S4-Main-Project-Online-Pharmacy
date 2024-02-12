@@ -152,7 +152,7 @@
     <header class="header_section">
       <div class="container-fluid">
         <nav class="navbar navbar-expand-lg custom_nav-container ">
-          <a class="navbar-brand" href="admin.php">
+          <a class="navbar-brand" href="staff.php">
             <span>
               PHARMIO STAFF ZONE
             </span>
@@ -170,9 +170,7 @@
     </header>
     <!-- Sidebar -->
     <div class="sidebar">
-        <h1>Dashboard</h1>
-        <a href="newcustomer.php" class="menu-item">Cutomer Registration</a>
-        <a href="sales_page.php" class="menu-item">New Sale</a>
+        <a href="purchase.php" class="menu-item">New Purchase</a>
         <a href="invoice.php" class="menu-item">Invoice</a>
         <a href="reciept.php" class="menu-item">Reciept</a>
         <a href="sales_report.php" class="menu-item">Sales Report</a>
