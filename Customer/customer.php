@@ -86,13 +86,28 @@
     }
 
     .product-card {
-        width: 250px; /* Set the desired width */
+        position: relative;
+        width: 270px; /* Set the desired width */
         height: 350px; /* Set the desired height */
         border: 1px solid #ddd; /* Add border for better visibility */
         margin: 10px; /* Adjust margin as needed */
         padding: 10px; /* Adjust padding as needed */
         text-align: center; /* Center content within the card */
     }
+
+    .favorites-button {
+        position: absolute;
+        top: 15px; /* Adjust top position as needed */
+        right: 15px; /* Adjust right position as needed */
+        cursor: pointer;
+    }
+
+    .favorites-icon {
+        font-size: 24px;
+        color: <?php echo $isInWishlist ? 'black' : '#ccc'; ?>;
+        /* Customize colors based on wishlist status */
+    }
+
 
     .product-image {
         max-width: 100%; /* Ensure the image does not exceed the width of the container */
@@ -101,11 +116,6 @@
 
     .product-header {
         margin-bottom: 10px;
-    }
-
-    .favorites-icon {
-        color: red; /* Customize the color of the heart icon */
-        margin-right: 5px;
     }
 
     .product-list {
@@ -122,6 +132,7 @@
 
         .product-card {
             width: 100%; /* Occupy full width on smaller screens */
+            position: relative;
         }
     }
 
@@ -156,16 +167,17 @@
         right: 10px;
     }
 
-    .favorites-icon {
-        font-size: 24px;
-        color: #ccc; /* Default color for unfilled heart */
+    .favorites-button {
+        position: absolute;
+        top: 10px; /* Adjust top position as needed */
+        right: 10px; /* Adjust right position as needed */
         cursor: pointer;
-        top: 10px; /* Adjust the top position as needed */
-        right: 20px;
     }
 
-    .favorites-icon.fas {
-        color: black; /* Color for filled heart */
+    .favorites-icon {
+        font-size: 24px;
+        color: <?php echo $isInWishlist ? 'black' : '#ccc'; ?>;
+        /* Customize colors based on wishlist status */
     }
 
     .cart-button,
@@ -396,28 +408,24 @@
             $isInWishlist = ($wishlistResult && $wishlistResult->num_rows > 0);
     ?>
     <div class="product-card" data-medicine-id="<?php echo $row['Med_id']; ?>">
-    <div class="product-header">
-        <?php
-            // Output the heart icon based on wishlist status
-            if ($isInWishlist) {
-                echo '<i class="favorites-icon fas fa-heart"></i>';
-            } else {
-                echo '<i class="favorites-icon far fa-heart"></i>';
-            }
-        ?>
-    </div>
+        <form action="toggle_wishlist.php" method="post" class="wishlist-form">
+            <input type="hidden" name="medId" value="<?php echo $row['Med_id']; ?>">
+            <div class="favorites-button">
+                <i class="favorites-icon <?php echo $isInWishlist ? 'fas' : 'far'; ?> fa-heart"></i>
+            </div>
+        </form>
         <img class="product-image" src="data:image/jpeg;base64,<?php echo $base64Image; ?>" alt="<?php echo $row["Med_name"]; ?>">
         <a href="medicine_details.php"><h3><?php echo $row["Med_name"]; ?></h3></a>
         <p>Generic Name: <?php echo $row["generic_name"]; ?></p>
         <p>Price: Rs.<?php echo $row["Price"]; ?></p>
         <form action="add_to_cart.php" method="post">
             <input type="hidden" name="medicineName" value="<?php echo $row['Med_name']; ?>">
-            <button class="cart-button"  type="submit">
+            <button class="cart-button" type="submit">
                 <i class="fas fa-cart-plus"></i> Add to Cart
             </button>
         </form>
         <form action="">
-        <button class="buy-now-button"><i class="fas fa-shopping-cart"></i> Buy Now</button>
+            <button class="buy-now-button"><i class="fas fa-shopping-cart"></i> Buy Now</button>
         </form>
     </div>
     <?php
@@ -433,7 +441,7 @@
     ?>
 </div>
 <script>
-     function addToCart(medicineName) {
+    function addToCart(medicineName) {
         // You can use AJAX to send a request to add_to_cart.php
         // Example using jQuery:
         $.post("add_to_cart.php", { medicineName: medicineName },
@@ -441,7 +449,44 @@
                     alert(data); // You can replace this with any other logic
         to handle the response
                 });
-            }
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        const wishlistForms = document.querySelectorAll('.wishlist-form');
+
+        wishlistForms.forEach(function(form) {
+            form.addEventListener('submit', function(event) {
+                event.preventDefault();
+
+                const heartIcon = form.querySelector('.favorites-icon');
+                const isInWishlist = heartIcon.classList.contains('fas');
+
+                // Toggle the filled and empty heart icons
+                heartIcon.classList.toggle('fas', !isInWishlist);
+                heartIcon.classList.toggle('far', isInWishlist);
+
+                // Submit the form asynchronously using fetch or XMLHttpRequest
+                fetch('toggle_wishlist.php', {
+                    method: 'POST',
+                    body: new FormData(form),
+                }).then(response => {
+                    // Handle the response as needed
+                    if (!response.ok) {
+                        // If there is an error, revert the heart icon toggle
+                        heartIcon.classList.toggle('fas', isInWishlist);
+                        heartIcon.classList.toggle('far', !isInWishlist);
+                    }
+                }).catch(error => {
+                    console.error('Error:', error);
+
+                    // If there is an error, revert the heart icon toggle
+                    heartIcon.classList.toggle('fas', isInWishlist);
+                    heartIcon.classList.toggle('far', !isInWishlist);
+                });
+            });
+        });
+    });
+
 </script>
 </body>
 </html>
