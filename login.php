@@ -31,6 +31,44 @@
             }
         }
 
+        // Check if it's a staff login
+        $staff_query = "SELECT * FROM staff WHERE username='$username' AND status=1";
+        $staff_result = $conn->query($staff_query);
+
+        if (!$staff_result) {
+            die("Staff SQL query failed: " . $conn->error);
+        }
+
+        if ($staff_result->num_rows > 0) {
+            $staff_row = $staff_result->fetch_assoc();
+            
+            // Debugging output
+            echo "Staff Row: " . print_r($staff_row, true) . "<br>";
+
+            // Check if the 'password_hash' key exists in the result
+            if (array_key_exists('password_hash', $staff_row)) {
+                $hashed_staff_password = $staff_row['password_hash'];
+
+                // Debugging output
+                echo "Database Hashed Password: $hashed_staff_password<br>";
+                echo "Generated Hashed Password: " . password_hash($password, PASSWORD_DEFAULT) . "<br>";
+
+                // Verify the staff password using password_verify
+                if (password_verify($password, $hashed_staff_password)) {
+                    // Staff login successful
+                    $_SESSION['staff_username'] = $username;
+                    header('Location: staff.php');
+                    exit();
+                } else {
+                    echo "Password verification failed<br>";
+                }
+            } else {
+                echo "Password hash key not found in staff result<br>";
+            }
+        }
+
+
+
         // Admin credentials (assuming you store hashed admin password in the database)
         $admin_username = "admin";
         $admin_password = "Admin@1234";
