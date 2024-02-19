@@ -166,6 +166,15 @@ if (!isset($_SESSION['admin'])) {
         border-radius: 5px;
     }
 
+    input, select {
+        width: 100%;
+        padding: 10px;
+        box-sizing: border-box;
+        border: 1px solid #ced4da;
+        border-radius: 5px;
+        height: 40px; /* Set the desired height for consistency */
+    }
+
     button {
         padding: 10px;
         background-color: #007bff;
@@ -256,50 +265,80 @@ if (!isset($_SESSION['admin'])) {
 
     <div class="container">
         <h2>Add Staff</h2>
-        <form id="staffForm">
-            <label for="username">Username:</label>
+        <form id="staffForm" onsubmit="return validateForm()">
+            <label for="username">Username<span style="color: red;">*</span>:</label>
             <input type="text" id="username" name="username" required>
 
-            <label for="firstName">First Name:</label>
+            <label for="firstName">First Name<span style="color: red;">*</span>:</label>
             <input type="text" id="firstName" name="firstName" required>
 
-            <label for="lastName">Last Name:</label>
+            <label for="lastName">Last Name<span style="color: red;">*</span>:</label>
             <input type="text" id="lastName" name="lastName" required>
 
-            <label for="dob">Date of Birth:</label>
+            <label for="dob">Date of Birth<span style="color: red;">*</span>:</label>
             <input type="date" id="dob" name="dob" required>
 
-            <label for="gender">Gender:</label>
-            <input type="text" id="gender" name="gender" required>
+            <label for="gender">Gender<span style="color: red;">*</span>:</label>
+            <select id="gender" name="gender" required>
+                <option value="" disabled selected>Select gender</option>
+                <option value="male">Male</option>
+                <option value="female">Female</option>
+                <option value="others">Others</option>
+            </select>
 
-            <label for="buildingName">Building Name:</label>
+            <label for="buildingName">Building Name<span style="color: red;">*</span>:</label>
             <input type="text" id="buildingName" name="buildingName" required>
 
-            <label for="street">Street:</label>
+            <label for="street">Street<span style="color: red;">*</span>:</label>
             <input type="text" id="street" name="street" required>
 
-            <label for="city">City:</label>
+            <label for="city">City<span style="color: red;">*</span>:</label>
             <input type="text" id="city" name="city" required>
 
-            <label for="district">District:</label>
+            <label for="district">District<span style="color: red;">*</span>:</label>
             <input type="text" id="district" name="district" required>
 
-            <label for="phone">Phone:</label>
+            <label for="district">Pincode<span style="color: red;">*</span>:</label>
+            <input type="text" id="pincode" name="pincode" required>
+
+            <label for="phone">Phone<span style="color: red;">*</span>:</label>
             <input type="tel" id="phone" name="phone" required>
 
-            <label for="password">Password:</label>
+            <label for="password">Password<span style="color: red;">*</span>:</label>
             <input type="password" id="password" name="password" required>
 
-            <label for="roleId">Role ID:</label>
-            <input type="number" id="roleId" name="roleId" required>
-
-            <label for="status">Status:</label>
-            <input type="number" id="status" name="status" required>
+            <label for="password">Confirm Password<span style="color: red;">*</span>:</label>
+            <input type="password" id="confirm_password" name="confirm_password">
 
             <button type="submit">Add Staff</button>
         </form>
     </div>
 
     <script src="script.js"></script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            document.getElementById('staffForm').addEventListener('submit', function (event) {
+                event.preventDefault(); // Prevent the default form submission
+
+                // Validate the form here if needed
+
+                // Prepare form data
+                var formData = new FormData(this);
+
+                // Send AJAX request to process_staff.php
+                var xhr = new XMLHttpRequest();
+                xhr.open('POST', 'process_staff.php', true);
+                xhr.onload = function () {
+                    var response = JSON.parse(xhr.responseText);
+                    alert(response.message);
+
+                    // Optionally, you can redirect or perform other actions based on the response
+                };
+                xhr.send(formData);
+            });
+        });
+
+    </script>
 </body>
 </html>
