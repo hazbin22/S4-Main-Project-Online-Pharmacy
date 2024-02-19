@@ -265,7 +265,7 @@ if (!isset($_SESSION['admin'])) {
 
     <div class="container">
         <h2>Add Staff</h2>
-        <form id="staffForm" onsubmit="return validateForm()">
+        <form id="staffForm" action="process_staff.php" method="POST" onsubmit="return validateForm()">
             <label for="username">Username<span style="color: red;">*</span>:</label>
             <input type="text" id="username" name="username" required>
 
@@ -317,26 +317,33 @@ if (!isset($_SESSION['admin'])) {
     <script src="script.js"></script>
 
     <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            document.getElementById('staffForm').addEventListener('submit', function (event) {
-                event.preventDefault(); // Prevent the default form submission
+        document.addEventListener("DOMContentLoaded", function() {
+          var menuItems = document.querySelectorAll(".menu-item");
+          menuItems.forEach(function(item) {
+              item.addEventListener("click", function() {
+                  // Toggle submenu for the clicked item
+                  var submenu = item.nextElementSibling;
+                  if (submenu) {
+                      if (submenu.style.display === "block") {
+                          submenu.style.display = "none";
+                          item.classList.remove("active");
+                      } else {
+                          // Hide all submenus
+                          var submenus = document.querySelectorAll(".submenu");
+                          submenus.forEach(function(submenu) {
+                              submenu.style.display = "none";
+                          });
 
-                // Validate the form here if needed
-
-                // Prepare form data
-                var formData = new FormData(this);
-
-                // Send AJAX request to process_staff.php
-                var xhr = new XMLHttpRequest();
-                xhr.open('POST', 'process_staff.php', true);
-                xhr.onload = function () {
-                    var response = JSON.parse(xhr.responseText);
-                    alert(response.message);
-
-                    // Optionally, you can redirect or perform other actions based on the response
-                };
-                xhr.send(formData);
-            });
+                          submenu.style.display = "block";
+                          // Toggle active class for menu items
+                          menuItems.forEach(function(menuItem) {
+                              menuItem.classList.remove("active");
+                          });
+                          item.classList.add("active");
+                      }
+                  }
+              });
+          });
         });
 
     </script>

@@ -261,12 +261,33 @@ if (!isset($_SESSION['admin'])) {
     <table class="table">
         <thead>
             <tr>
-                
+            <th>Username</th>
+            <th>First Name</th>
+            <th>Last Name</th>
+            <th>Action</th> 
             </tr>
         </thead>
         <tbody>
             <?php
+                // Assuming $conn is your database connection
+                $result = $conn->query("SELECT * FROM staff WHERE status = 1");
 
+                if ($result->num_rows > 0) {
+                    while ($row = $result->fetch_assoc()) {
+                        echo "<tr>";
+                        echo "<td>" . $row["username"] . "</td>";
+                        echo "<td>" . $row["first_name"] . "</td>";
+                        echo "<td>" . $row["last_name"] . "</td>";
+                        echo "<td class='action-buttons'>";
+                        echo "<button onclick='viewStaff(" . $row["staff_id"] . ")'>View</button>";
+                        echo "<button onclick='editStaff(" . $row["staff_id"] . ")'>Edit</button>";
+                        echo "<button onclick='deactivateStaff(" . $row["staff_id"] . ")'>Deactivate</button>";
+                        echo "</td>";
+                        echo "</tr>";
+                    }
+                } else {
+                    echo "<tr><td colspan='4'>No active staff records found</td></tr>";
+                }
             ?>
         </tbody>
     </table>
@@ -304,6 +325,21 @@ if (!isset($_SESSION['admin'])) {
               });
           });
         });
+
+        function viewStaff(staffId) {
+            window.location.href = 'view_staff.php?staff_id=' + staffId;
+        }
+
+        function editStaff(staffId) {
+            window.location.href = 'edit_staff.php?staff_id=' + staffId;
+        }
+
+        function deactivateStaff(staffId) {
+            var confirmDeactivation = confirm('Are you sure you want to deactivate this staff member?');
+            if (confirmDeactivation) {
+                window.location.href = 'deactivate_staff.php?staff_id=' + staffId;
+            }
+        }
 
     </script>
     </body>

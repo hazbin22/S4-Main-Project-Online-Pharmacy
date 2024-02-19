@@ -2,77 +2,85 @@
 include('db_config.php');
 session_start();
 
-$response = array();
-
-if (!isset($_SESSION['admin'])) {
-    $response['error'] = true;
-    $response['message'] = "User not authenticated";
-} elseif ($_SERVER["REQUEST_METHOD"] == "POST") {
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // Collect form data
-    $username = $_POST["username"];
-    $firstName = $_POST["firstName"];
-    $lastName = $_POST["lastName"];
-    $dob = $_POST["dob"];
-    $gender = $_POST["gender"];
-    $buildingName = $_POST["buildingName"];
-    $street = $_POST["street"];
-    $city = $_POST["city"];
-    $district = $_POST["district"];
-    $phone = $_POST["phone"];
-    $pincode = $_POST["pincode"];
-    $password = password_hash($_POST["password"], PASSWORD_DEFAULT); // Hash the password
-    $status = 1; // Default status value
-    $role_id = 3; // Default role_id value
+    $username = $_POST['username'];
+    $firstName = $_POST['firstName'];
+    $lastName = $_POST['lastName'];
+    $dob = $_POST['dob'];
+    $gender = $_POST['gender'];
+    $buildingName = $_POST['buildingName'];
+    $street = $_POST['street'];
+    $city = $_POST['city'];
+    $district = $_POST['district'];
+    $pincode = $_POST['pincode'];
+    $phone = $_POST['phone'];
+    $password = password_hash($_POST['password'], PASSWORD_DEFAULT);
+    
+    // Default values for status and role_id
+    $status = 1;
+    $role_id = 3;
 
-    // Start a transaction
-    $conn->begin_transaction();
+    // Check if the username is unique (you may want to implement your own uniqueness check)
+    $checkUsernameQuery = "SELECT COUNT(*) FROM staff WHERE username = ?";
+    $stmtCheckUsername = $conn->prepare($checkUsernameQuery);
+    $stmtCheckUsername->bind_param("s", $username);
+    $stmtCheckUsername->execute();
+    $stmtCheckUsername->bind_result($usernameCount);
+    $stmtCheckUsername->fetch();
+    $stmtCheckUsername->close();
 
-    try {
-        // SQL query to insert data into the address_details table
-        $addressQuery = "INSERT INTO address_details (building_or_house, street, city, district, pincode, phone, status)
-                        VALUES ('$buildingName', '$street', '$city', '$district', $pincode, '$phone', $status)";
-
-        if (!$conn->query($addressQuery)) {
-            throw new Exception("Error inserting into address_details: " . $conn->error);
-        }
+    if ($usernameCount > 0) {
+        echo "<script>alert('Username is already taken. Please choose a different one.');</script>";
+    } else {
+        // Insert staff data into the database
+        $insertQuery = "INSERT INTO address_details (building_or_house, street, city, district, pincode, phone, status)
+                        VALUES (?, ?, ?, ?, ?, ?, ?)";
+        $stmtAddress = $conn->prepare($insertQuery);
+        $stmtAddress->bind_param("ssssisi", $buildingName, $street, $city, $district, $pincode, $phone, $status);
+        $stmtAddress->execute();
 
         // Get the last inserted address_id
         $addressId = $conn->insert_id;
 
-        // SQL query to insert data into the staff table
-        $staffQuery = "INSERT INTO staff (username, first_name, last_name, date_of_birth, gender, address_id, phone, password_hash, status, role_id)
-                        VALUES ('$username', '$firstName', '$lastName', '$dob', '$gender', '$addressId', '$phone', '$password', $status, $role_id)";
+        // Insert staff data into the staff table
+        $insertStaffQuery = "INSERT INTO staff (username, first_name, last_name, date_of_birth, gender, address_id, phone, password_hash, status, role_id)
+                        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        $stmtStaff = $conn->prepare($insertStaffQuery);
+        $stmtStaff->bind_param(
+            "sssssisiii",
+            $username,
+            $firstName,
+            $lastName,
+            $dob,
+            $gender,
+            $addressId,
+            $phone,
+            $password,
+            $status,
+            $role_id
+        );
 
-        if (!$conn->query($staffQuery)) {
-            throw new Exception("Error inserting into staff: " . $conn->error);
+        // Execute the statement
+        if ($stmtStaff->execute()) {
+            // Retrieve the last inserted ID
+            $lastInsertedStaffId = $stmtStaff->insert_id;
+            $_SESSION['last_inserted_staff_id'] = $lastInsertedStaffId;
+
+            // Display a success alert and redirect
+            echo "<script>alert('Staff added successfully. Last Inserted ID: $lastInsertedStaffId');</script>";
+            echo "<script>window.location.href='staff_view.php?staff_id=$lastInsertedStaffId';</script>";
+            exit();
+        } else {
+            // Display an error alert
+            echo "<script>alert('Error adding staff: " . $stmtStaff->error . "');</script>";
         }
 
-        // Commit the transaction
-        $conn->commit();
-        $response['error'] = false;
-        $response['message'] = "Staff and address details added successfully!";
-    } catch (Exception $e) {
-        // Rollback the transaction in case of an exception
-        $conn->rollback();
-        $response['error'] = true;
-        $response['message'] = "Transaction failed: " . $e->getMessage();
+        // Close the statements
+        $stmtAddress->close();
+        $stmtStaff->close();
     }
-
-    // Close the database connection
-    $conn->close();
-} else {
-    $response['error'] = true;
-    $response['message'] = "Invalid request method";
 }
 
-// Send JSON response
-header('Content-Type: application/json');
-echo json_encode($response);
+$conn->close();
 ?>
-<script>
-    // Check if reload flag is set in the response
-    if (<?php echo json_encode($response['reload']); ?>) {
-        // Reload the page
-        window.location.reload();
-    }
-</script>
