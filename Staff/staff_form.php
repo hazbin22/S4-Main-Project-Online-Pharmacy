@@ -314,115 +314,31 @@ if (!isset($_SESSION['admin'])) {
         </form>
     </div>
 
-    <?php
-
-
-      if ($_SERVER["REQUEST_METHOD"] == "POST") {
-          // Collect form data
-          $username = $_POST["username"];
-          $firstName = $_POST["firstName"];
-          $lastName = $_POST["lastName"];
-          $dob = $_POST["dob"];
-          $gender = $_POST["gender"];
-          $buildingName = $_POST["buildingName"];
-          $street = $_POST["street"];
-          $city = $_POST["city"];
-          $district = $_POST["district"];
-          $phone = $_POST["phone"];
-          $pincode = $_POST["picode"];
-          $password = password_hash($_POST["password"], PASSWORD_DEFAULT); // Hash the password
-          $status = $_POST["status"];
-
-          // SQL query to insert data into the address_details table
-          $addressQuery = "INSERT INTO address_details (building_or_house, street, city, district, pincode, phone, status)
-                          VALUES ('$buildingName', '$street', '$city', '$district', $pincode, '$phone', 0)";
-
-          if ($conn->query($addressQuery) === TRUE) {
-              // Get the last inserted address_id
-              $addressId = $conn->insert_id;
-
-              // SQL query to insert data into the staff table
-              $staffQuery = "INSERT INTO staff (username, first_name, last_name, date_of_birth, gender, address_id, phone, password_hash, status)
-                              VALUES ('$username', '$firstName', '$lastName', '$dob', '$gender', '$addressId', '$phone', '$password', '$status')";
-
-              if ($conn->query($staffQuery) === TRUE) {
-                  echo "Staff and address details added successfully!";
-              } else {
-                  echo "Error inserting into staff: " . $conn->error;
-              }
-          } else {
-              echo "Error inserting into address_details: " . $conn->error;
-          }
-      }
-
-      // Close the database connection
-      $conn->close();
-    ?>
-
     <script src="script.js"></script>
 
     <script>
         document.addEventListener('DOMContentLoaded', function () {
-            // Add event listeners for on-the-fly validation
-            document.getElementById('username').addEventListener('input', validateUsername);
-            document.getElementById('firstName').addEventListener('input', validateName);
-            document.getElementById('lastName').addEventListener('input', validateName);
-            document.getElementById('dob').addEventListener('input', validateDate);
-            document.getElementById('gender').addEventListener('change', validateGender);
-            document.getElementById('buildingName').addEventListener('input', validateText);
-            document.getElementById('street').addEventListener('input', validateText);
-            document.getElementById('city').addEventListener('input', validateText);
-            document.getElementById('district').addEventListener('input', validateText);
-            document.getElementById('phone').addEventListener('input', validatePhone);
-            document.getElementById('password').addEventListener('input', validatePassword);
-            document.getElementById('confirm_password').addEventListener('input', validatePassword);
-            document.getElementById('status').addEventListener('input', validateStatus);
+            document.getElementById('staffForm').addEventListener('submit', function (event) {
+                event.preventDefault(); // Prevent the default form submission
+
+                // Validate the form here if needed
+
+                // Prepare form data
+                var formData = new FormData(this);
+
+                // Send AJAX request to process_staff.php
+                var xhr = new XMLHttpRequest();
+                xhr.open('POST', 'process_staff.php', true);
+                xhr.onload = function () {
+                    var response = JSON.parse(xhr.responseText);
+                    alert(response.message);
+
+                    // Optionally, you can redirect or perform other actions based on the response
+                };
+                xhr.send(formData);
+            });
         });
 
-        function validateUsername() {
-            // Add your validation logic for username
-            // Example: Check if it contains only alphanumeric characters
-        }
-
-        function validateName() {
-            // Add your validation logic for first and last name
-            // Example: Check if it contains only letters
-        }
-
-        function validateDate() {
-            // Add your validation logic for date
-            // Example: Check if it matches a specific date format
-        }
-
-        function validateGender() {
-            // Add your validation logic for gender
-            // Example: Check if a valid option is selected
-        }
-
-        function validateText() {
-            // Add your validation logic for buildingName, street, city, and district
-            // Example: Check if it contains only letters and spaces
-        }
-
-        function validatePhone() {
-            // Add your validation logic for phone
-            // Example: Check if it contains only digits and has the correct length
-        }
-
-        function validatePassword() {
-            // Add your validation logic for password
-            // Example: Check if it meets specific password requirements
-        }
-
-        function validateStatus() {
-            // Add your validation logic for status
-            // Example: Check if it's a valid numeric value
-        }
-
-        function validateForm() {
-            // Add your form-level validation logic here
-            // Example: Check if all fields are valid before submitting the form
-        }
     </script>
 </body>
 </html>
