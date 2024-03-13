@@ -40,6 +40,16 @@ if ($brandResult->num_rows > 0) {
     $brandOptions .= "<option value=\"\" disabled>No brands found</option>";
 }
 
+$taxTableName = "general_tax_rates"; // Adjust the table name as needed
+
+// Fetch general tax rates from the specified table
+$taxQuery = "SELECT rate_value FROM $taxTableName";
+$taxResult = mysqli_query($conn, $taxQuery);
+
+if (!$taxResult) {
+    die("Query failed: " . mysqli_error($conn));
+}
+
 // Close the category result set
 $categoryResult->close();
 
@@ -330,12 +340,10 @@ $categoryResult->close();
         <h1>Dashboard</h1>
         <a href="#" class="menu-item">Customer</a>
         <div class="submenu">
-            <a href="" class="sub-item">View Customers</a><br>
             <a href="customer_view.php" class="sub-item">Manage Customers</a>
         </div>
         <a href="#" class="menu-item">Staff</a>
         <div class="submenu">
-            <a href="" class="sub-item">View Staffs</a><br>
             <a href="staff_view.php" class="sub-item">Manage Staff</a>
         </div>
         <a href="#" class="menu-item">Medicines</a>
@@ -343,6 +351,11 @@ $categoryResult->close();
         <a href="medicine_view.php" class="sub-item">Manage Medicines</a><br>
         <a href="medicine_category.php" class="sub-item">Manage Categories</a><br>
         <a href="medicine_brands.php" class="sub-item">Manage Brands</a><br>
+        </div>
+        <a href="#" class="menu-item">Manage Delivery Team</a>
+        <div class="submenu">
+            <a href="delivery_members.php" class="sub-item">Manage Members</a><br>
+            <a href="assign_delivery.php" class="sub-item">Assign Orders</a><br>
         </div>
     </div>
     <div class="content">
@@ -364,6 +377,9 @@ $categoryResult->close();
     <label for="batchno">Batch Number <span style="color: red;">*</span>:</label>
     <input type="text" id="batchno" name="batchno" required><br>
 
+    <label for="manufacturer">Manufacturer:</label>
+    <input type="text" id="manufacturer" name="manufacturer"><br>
+
     <label for="manuf_date">Manufacturing Date <span style="color: red;">*</span>:</label>
     <input type="date" id="manuf_date" name="manuf_date" required><br>
 
@@ -377,6 +393,28 @@ $categoryResult->close();
     <select id="category_id" name="category_id" required style="width: 780px; height: 40px;">
         <?php echo $categoryOptions; ?>
     </select><br><br>
+
+    <label for="hsn_code">HSN Code:</label>
+    <input type="text" id="hsn_code" name="hsn_code"><br>
+
+    <label for="tax_category">Tax Category:</label>
+    <input type="text" id="tax_category" name="tax_category" value="Medicine"><br>
+
+    <label for="tax_rate">Tax Rate:</label>
+    <select id="tax_rate" name="tax_rate" style="width: 780px; height: 40px;">
+    <option value="" selected>Select Rate</option>
+        <?php
+        while ($taxRow = mysqli_fetch_assoc($taxResult)) {
+            echo "<option value='{$taxRow['rate_value']}'>{$taxRow['rate_value']}%</option>";
+        }
+
+        // Free the result set
+        mysqli_free_result($taxResult);
+        ?>
+    </select><br>
+
+    <label for="medicine_tax_rate">Medicine Tax Rate:</label>
+    <input type="number" id="medicine_tax_rate" name="medicine_tax_rate" step="0.01" value="0.00"><br>
 
     <label for="stock">Stock <span style="color: red;">*</span>:</label>
     <input type="number" id="stock" name="stock" required><br>

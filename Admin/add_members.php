@@ -46,52 +46,59 @@ if (!isset($_SESSION['admin'])) {
   <!-- responsive style -->
   <link href="css/responsive.css" rel="stylesheet" />
   <style>
-      body {
-          font-family: Arial, sans-serif;
-        }
+    body {
+        font-family: Arial, sans-serif;
+    }
 
-        /* CSS for the Container */
-        .container {
-            max-width: 800px;
-            margin-left: 250px;
-            margin-top: 20px;
-            padding: 20px;
-            background-color: #ffffff; /* Set your desired background color */
-        }
+    .header_section {
+        position: fixed;
+        width: 100%;
+        top: 0;
+        z-index: 1000; /* Ensure the header is above other elements */
+    }
 
-        /* CSS for the Heading */
-        .container h2 {
-            text-align: left;
-            margin-bottom: 20px;
-        }
+    /* CSS for the Container */
+    .container {
+        max-width: 800px;
+        margin-left: 250px;
+        margin-top: 76px;
+        padding: 20px;
+        background-color: #ffffff; /* Set your desired background color */
+    }
 
-        /* CSS for the Add Medicine Button */
-        .container .btn-primary {
-            margin-bottom: 0px;
-        }
+    /* CSS for the Heading */
+    .container h2 {
+        text-align: left;
+        margin-bottom: 20px;
+    }
 
-        /* CSS for the Table */
-        .container table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 20px;
-        }
+    /* CSS for the Add Medicine Button */
+    .container .btn-primary {
+        margin-bottom: 0px;
+    }
 
-        .container th, .container td {
-            border: 1px solid #ddd;
-            padding: 10px;
-            text-align: left;
-        }
+    /* CSS for the Table */
+    .container table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 20px;
+    }
 
-        .container th {
-            background-color: #f2f2f2;
-        }
+    .container th, .container td {
+        border: 1px solid #ddd;
+        padding: 10px;
+        text-align: left;
+    }
 
-        /* Additional styles can be added as needed for specific elements within the container */
+    .container th {
+        background-color: #f2f2f2;
+    }
 
-        .logout {
-          float: right;
-        }
+    /* Additional styles can be added as needed for specific elements within the container */
+
+    .logout {
+        float: right;
+    }
 
     /* Sidebar Styles */
     .sidebar {
@@ -140,51 +147,50 @@ if (!isset($_SESSION['admin'])) {
       padding: 20px;
     }
 
-    /* CSS for the table */
-    table {
+    form {
+        display: grid;
+        gap: 15px;
+    }
+
+    label {
+        display: inline-block;
+        margin-bottom: 5px;
+        font-weight: bold;
+    }
+
+    input {
         width: 100%;
-        border-collapse: collapse;
-        margin-top: 20px;
+        padding: 10px;
+        box-sizing: border-box;
+        border: 1px solid #ced4da;
+        border-radius: 5px;
     }
 
-    th, td {
-        border: 1px solid #ddd;
-        padding: 12px;
-        text-align: left;
+    input, select {
+        width: 100%;
+        padding: 10px;
+        box-sizing: border-box;
+        border: 1px solid #ced4da;
+        border-radius: 5px;
+        height: 40px; /* Set the desired height for consistency */
     }
 
-    th {
-        background-color: #f2f2f2;
-        white-space: nowrap; /* Prevent line breaks in column headings */
-        overflow: hidden; /* Hide overflowing content */
-        text-overflow: ellipsis; /* Show ellipsis (...) when content overflows */
-    }
-
-    /* CSS for buttons in the table */
-    .action-buttons button {
-        cursor: pointer;
-        padding: 8px 16px;
-        margin-right: 10px;
-        border: none;
+    button {
+        padding: 10px;
         background-color: #007bff;
         color: #fff;
+        border: none;
         border-radius: 5px;
+        cursor: pointer;
         transition: background-color 0.3s ease;
+        width: 150px;
+        display: inline-block; /* Make the button take the width of its content */
     }
 
-    .action-buttons button.delete-btn {
-        background-color: #dc3545;
-    }
-
-    .action-buttons button:hover {
+    button:hover {
         background-color: #0056b3;
     }
 
-
-    .dashboard-link {
-      text-decoration: none;
-      color: inherit;
-    }
 
     .logout-button {
       background-color: #007bff;
@@ -215,7 +221,7 @@ if (!isset($_SESSION['admin'])) {
       </div>
     </div>
 
-    <!-- header section strats -->
+    <!-- header section starts -->
     <header class="header_section">
       <div class="container-fluid">
         <nav class="navbar navbar-expand-lg custom_nav-container ">
@@ -235,74 +241,70 @@ if (!isset($_SESSION['admin'])) {
         </nav>
       </div>
     </header>
+    <!-- header section ends -->
+
     <!-- Sidebar -->
-    <div class="sidebar">
-        <h1>Dashboard</h1>
-        <a href="#" class="menu-item">Customer</a>
-        <div class="submenu">
-            <a href="customer_view.php" class="sub-item">Manage Customers</a>
-        </div>
-        <a href="#" class="menu-item">Staff</a>
-        <div class="submenu">
-            <a href="staff_view.php" class="sub-item">Manage Staff</a>
-        </div>
-        <a href="#" class="menu-item">Medicines</a>
-        <div class="submenu">
-            <a href="medicine_view.php" class="sub-item">Manage Medicines</a><br>
-            <a href="medicine_category.php" class="sub-item">Manage Categories</a><br>
-            <a href="medicine_brands.php" class="sub-item">Manage Brands</a><br>
-        </div>
-        <a href="#" class="menu-item">Manage Delivery Team</a>
+        <div class="sidebar">
+            <h1>Dashboard</h1>
+            <a href="#" class="menu-item">Customer</a>
+            <div class="submenu">
+                <a href="customer_view.php" class="sub-item">Manage Customers</a>
+            </div>
+            <a href="#" class="menu-item">Staff</a>
+            <div class="submenu">
+                <a href="staff_view.php" class="sub-item">Manage Staff</a>
+            </div>
+            <a href="#" class="menu-item">Medicines</a>
+            <div class="submenu">
+                <a href="medicine_view.php" class="sub-item">Manage Medicines</a><br>
+                <a href="medicine_category.php" class="sub-item">Manage Categories</a><br>
+                <a href="medicine_brands.php" class="sub-item">Manage Brands</a><br>
+            </div>
+            <a href="#" class="menu-item">Manage Delivery Team</a>
         <div class="submenu">
             <a href="delivery_members.php" class="sub-item">Manage Members</a><br>
             <a href="assign_delivery.php" class="sub-item">Assign Orders</a><br>
         </div>
+        </div>
+    <!-- Sidebar ends -->
+
+    <div class="container">
+        <h2>Add Member</h2>
+        <form id="addMember " action="process_members.php" method="POST" onsubmit="return validateForm()">
+            <label for="username">Username<span style="color: red;">*</span>:</label>
+            <input type="text" id="username" name="username" required>
+
+            <label for="firstName">First Name<span style="color: red;">*</span>:</label>
+            <input type="text" id="firstName" name="firstName" required>
+
+            <label for="lastName">Last Name<span style="color: red;">*</span>:</label>
+            <input type="text" id="lastName" name="lastName" required>
+
+            <label for="dob">Date of Birth<span style="color: red;">*</span>:</label>
+            <input type="date" id="dob" name="dob" required>
+
+            <label for="gender">Gender<span style="color: red;">*</span>:</label>
+            <select id="gender" name="gender" required>
+                <option value="" disabled selected>Select gender</option>
+                <option value="male">Male</option>
+                <option value="female">Female</option>
+                <option value="others">Others</option>
+            </select>
+
+            <label for="password">Password<span style="color: red;">*</span>:</label>
+            <input type="password" id="password" name="password" required>
+
+            <label for="password">Confirm Password<span style="color: red;">*</span>:</label>
+            <input type="password" id="confirm_password" name="confirm_password">
+
+            <button type="submit">Add Member</button>
+        </form>
     </div>
-    
-   <!-- Add Medicines Management Table and Add Medicine Link -->
-   <div class="container">
-    <h2>Staff Management</h2>
-    <a href="staff_form.php" class="btn btn-primary mb-3">Add Staff</a>
-    <table class="table">
-        <thead>
-            <tr>
-            <th>Username</th>
-            <th>First Name</th>
-            <th>Last Name</th>
-            <th>Action</th> 
-            </tr>
-        </thead>
-        <tbody>
-            <?php
-                // Assuming $conn is your database connection
-                $result = $conn->query("SELECT * FROM staff WHERE status = 1");
 
-                if ($result->num_rows > 0) {
-                    while ($row = $result->fetch_assoc()) {
-                        echo "<tr>";
-                        echo "<td>" . $row["username"] . "</td>";
-                        echo "<td>" . $row["first_name"] . "</td>";
-                        echo "<td>" . $row["last_name"] . "</td>";
-                        echo "<td class='action-buttons'>";
-                        echo "<button onclick='viewStaff(" . $row["staff_id"] . ")'>View</button>";
-                        echo "<button onclick='editStaff(" . $row["staff_id"] . ")'>Edit</button>";
-                        echo "<button onclick='deactivateStaff(" . $row["staff_id"] . ")'>Deactivate</button>";
-                        echo "</td>";
-                        echo "</tr>";
-                    }
-                } else {
-                    echo "<tr><td colspan='4'>No active staff records found</td></tr>";
-                }
-            ?>
-        </tbody>
-    </table>
-</div>
+    <script src="script.js"></script>
 
-
-
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script>
-      document.addEventListener("DOMContentLoaded", function() {
+        document.addEventListener("DOMContentLoaded", function() {
           var menuItems = document.querySelectorAll(".menu-item");
           menuItems.forEach(function(item) {
               item.addEventListener("click", function() {
@@ -331,26 +333,6 @@ if (!isset($_SESSION['admin'])) {
           });
         });
 
-        function viewStaff(staffId) {
-            window.location.href = 'view_staff.php?staff_id=' + staffId;
-        }
-
-        function editStaff(staffId) {
-            window.location.href = 'edit_staff.php?staff_id=' + staffId;
-        }
-
-        function deactivateStaff(staffId) {
-            var confirmDeactivation = confirm('Are you sure you want to deactivate this staff member?');
-            if (confirmDeactivation) {
-                // Call deactivate_staff.php with staff_id as a parameter
-                window.location.href = 'deactivate_staff.php?staff_id=' + staffId;
-            }
-        }
-
-
     </script>
-    </body>
+</body>
 </html>
-
-
-

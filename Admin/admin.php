@@ -183,12 +183,10 @@ if (!isset($_SESSION['admin'])) {
         <h1>Dashboard</h1>
         <a href="#" class="menu-item">Customer</a>
         <div class="submenu">
-            <a href="" class="sub-item">View Customers</a><br>
             <a href="customer_view.php" class="sub-item">Manage Customers</a>
         </div>
         <a href="#" class="menu-item">Staff</a>
         <div class="submenu">
-            <a href="" class="sub-item">View Staffs</a><br>
             <a href="staff_view.php" class="sub-item">Manage Staff</a>
         </div>
         <a href="#" class="menu-item">Medicines</a>
@@ -196,6 +194,11 @@ if (!isset($_SESSION['admin'])) {
             <a href="medicine_view.php" class="sub-item">Manage Medicines</a><br>
             <a href="medicine_category.php" class="sub-item">Manage Categories</a><br>
             <a href="medicine_brands.php" class="sub-item">Manage Brands</a><br>
+        </div>
+        <a href="#" class="menu-item">Manage Delivery Team</a>
+        <div class="submenu">
+            <a href="delivery_members.php" class="sub-item">Manage Members</a><br>
+            <a href="assign_delivery.php" class="sub-item">Assign Orders</a><br>
         </div>
     </div>
     <!-- Content Section -->

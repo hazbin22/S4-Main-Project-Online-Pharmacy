@@ -315,64 +315,16 @@ if (!isset($_SESSION['admin'])) {
 
     <!-- Add Medicines Management Table and Add Medicine Link -->
 <div class="container">
-    <h2>Brands</h2>
-    <a href="add_brands.php" class="btn btn-primary mb-3">Add Brands</a>
+    <h2>Team Members</h2>
+    <a href="add_members.php" class="btn btn-primary mb-3">Add Member</a>
     <table class="table">
     <thead>
         <tr>
-            <th>Sl No.</th>
-            <th>Brand Name</th>
-            <th>Description</th>
-            <th>Actions</th>
+            
         </tr>
     </thead>
     <tbody>
-    <?php
-        include('db_config.php');
-
-        // Fetch categories from the database
-        $query = "SELECT Brand_id, Brand_name, Brand_details, Status FROM brand_details ORDER BY Brand_name";
-        $result = $conn->query($query);
-
-        // Counter for serial number
-        $slNo = 1;
-
-        if ($result->num_rows > 0) {
-            while ($row = $result->fetch_assoc()) {
-                $categoryId = $row['Brand_id'];
-                $categoryName = $row['Brand_name'];
-                $description = $row['Brand_details'];
-                $status = $row['Status'];
-
-                echo "<tr>";
-
-                echo "<td>" . $slNo . "</td>"; // Display serial number
-                $slNo++; // Increment serial number for the next row
-
-                echo "<td>{$categoryName}</td>";
-                echo "<td>{$description}</td>";
-                echo "<td>";
-                
-                // Disable/Enable button based on status
-                if ($status == 1) {
-                    echo "<a href='category_management.php?id={$categoryId}&&action=disable' class='btn btn-danger'>Disable</a>";
-                } else {
-                    echo "<a href='category_management.php?id={$categoryId}&&action=enable' class='btn btn-success'>Enable</a>";
-                }
-
-                echo "</td>";
-                echo "</tr>";
-            }
-        } else {
-            echo "<tr><td colspan='4'>No categories found</td></tr>";
-        }
-
-        // Close the result set
-        $result->close();
-
-        // Close the connection
-        $conn->close();
-    ?>
+    
 
     </tbody>
     </table>   

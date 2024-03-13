@@ -6,42 +6,7 @@ if (!isset($_SESSION['admin'])) {
     header('Location: login.php'); // Redirect to admin login page if not logged in as admin
     exit();
 }
-
-if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    $brandName = $_POST["brand_name"];
-    $description = $_POST["brand_details"];
-
-    // Check if the brand name already exists
-    $checkQuery = "SELECT COUNT(*) FROM brand_details WHERE Brand_name = ?";
-    $checkStmt = $conn->prepare($checkQuery);
-    $checkStmt->bind_param("s", $brandName);
-    $checkStmt->execute();
-    $checkStmt->bind_result($brandCount);
-    $checkStmt->fetch();
-    $checkStmt->close();
-
-    if ($brandCount > 0) {
-        echo "<script>alert('Error: Brand with the same name already exists.');</script>";
-    } else {
-        $status = 1;
-        $stmt = $conn->prepare("INSERT INTO brand_details (Brand_name, Brand_details, Status) VALUES (?, ?, ?)");
-        $stmt->bind_param("ssi", $brandName, $description, $status);
-
-        if ($stmt->execute()) {
-            // Display a success message as an alert
-            echo "<script>alert('Brand added successfully');</script>";
-        } else {
-            echo "Error: " . $stmt->error;
-        }
-
-        $stmt->close();
-    }
-
-    $conn->close();
-}
 ?>
-
-
 
 <!DOCTYPE html>
 <html>
@@ -83,15 +48,23 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
   <style>
       body {
           font-family: Arial, sans-serif;
+          
+          overflow-x: auto;
         }
 
         /* CSS for the Container */
         .container {
-            max-width: 800px;
             margin-left: 250px;
+            margin-right: 0px;
             margin-top: 20px;
             padding: 20px;
             background-color: #ffffff; /* Set your desired background color */
+        }
+
+        .container table {
+            width: 100%; /* Adjusted to 'max-content' */
+            border-collapse: collapse;
+            margin-top: 20px;
         }
 
         /* CSS for the Heading */
@@ -102,15 +75,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
         /* CSS for the Add Medicine Button */
         .container .btn-primary {
-            margin-bottom: 220px;
+            margin-bottom: 0px;
         }
 
-        /* CSS for the Table */
-        .container table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 20px;
-        }
+    
 
         .container th, .container td {
             border: 1px solid #ddd;
@@ -128,15 +96,25 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
           float: right;
         }
 
+        .header_section {
+            position: fixed;
+            width: 100%;
+            z-index: 1000;
+            background-color: #ffffff;
+            box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
         /* Sidebar Styles */
         .sidebar {
-            height: 100%;
+            position: fixed;
+            height: calc(100vh - 76px);
             width: 250px;
             position: fixed;
             top: 76px;
             left: 0;
-            background-color: #f9f9f9;
+            background-color: #f2f2f2;
             padding-top: 20px;
+            overflow-y: auto;
         }
 
         .sidebar h1 {
@@ -171,8 +149,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
         /* Content Styles */
         .content {
-        margin-left: 250px;
-        padding: 20px;
+            margin-left: 250px;
+            padding: 20px;
+            overflow-x: auto;
+            overflow-y: auto; /* Add this line to enable vertical scrolling */
+            max-height: calc(100vh - 100px);
+            white-space: nowrap;
+            flex: 1;
         }
 
         /* CSS for the table */
@@ -180,12 +163,16 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             width: 100%;
             border-collapse: collapse;
             margin-top: 20px;
+            overflow-x: auto;
         }
 
         th, td {
             border: 1px solid #ddd;
             padding: 12px;
             text-align: left;
+
+            overflow: hidden; /* Hide overflowing content */
+            text-overflow: ellipsis; /* Show ellipsis (...) when content overflows */
         }
 
         th {
@@ -215,6 +202,14 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             background-color: #0056b3;
         }
 
+        .action-buttons {
+            display: flex;
+            align-items: center;
+        }
+
+        .action-buttons .btn {
+            margin-right: 20px; /* Adjust the margin as needed to create space between the buttons */
+        }
 
         .dashboard-link {
         text-decoration: none;
@@ -234,62 +229,55 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         .logout-button:hover {
         background-color: #0056b3;
         }
-
-        /* CSS for Add Medicine Form */
-        form {
-            max-width: 800px;
-            margin-left: 0px;
-            /*padding: 10px;*/
-            border-radius: 5px;
-            background-color: #fff;
+        
+        /* CSS for the Confirmation Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0, 0, 0, 0.5);
         }
 
-        form label {
-            display: block;
-            margin-bottom: 10px;
-            font-weight: bold;
+        .modal-content {
+            background-color: #fefefe;
+            margin: 15% auto;
+            padding: 20px;
+            border: 1px solid #888;
+            width: 80%;
+            text-align: center;
+            border-radius: 10px;
         }
 
-        form input[type="text"],
-        form input[type="textarea"],
-        form input[type="date"],
-        form input[type="file"] {
-            width: calc(100% - 20px);
-            padding: 10px;
-            margin-bottom: 15px;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-            font-size: 16px;
-        }
-
-        form button {
-            background-color: #007bff;
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 5px;
-            font-size: 18px;
+        .modal-buttons button {
             cursor: pointer;
+            padding: 10px 20px;
+            margin: 0 10px;
+            border: none;
+            background-color: #007bff;
+            color: #fff;
+            border-radius: 5px;
             transition: background-color 0.3s ease;
         }
 
-        form button:hover {
+        .modal-buttons button:hover {
             background-color: #0056b3;
         }
-
-        .header_section {
-            position: fixed;
-            width: 100%;
-            background-color: #f2f2f2; /* Set your desired background color for the header */
-            z-index: 1000;
+        /* CSS for buttons in the table */
+        .action-buttons {
+            display: flex;
+            align-items: center;
         }
 
-        .content {
-            margin-top: 76px; /* Adjust margin-top value to match the height of the fixed header */
-            padding: 20px;
+        .action-buttons .btn {
+            margin-right: 10px; /* Adjust the margin as needed to create space between the buttons */
         }
-    
-</style>
+
+    </style>
 </head>
 <body>
   <div class="hero_area">
@@ -298,7 +286,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         <img src="" width="100%" height="100%">
       </div>
     </div>
-
+    
     <!-- header section strats -->
     <header class="header_section">
       <div class="container-fluid">
@@ -312,7 +300,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             <ul class="navbar-nav  ">
               <li class="nav-item">
                 <a class="nav-link" href="logout.php"> <i class="fa fa-user" aria-hidden="true"></i> LogOut</a>
-              </li>            
+              </li>
+              
             </ul>
           </div>
         </nav>
@@ -327,14 +316,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         </div>
         <a href="#" class="menu-item">Staff</a>
         <div class="submenu">
-            <a href="" class="sub-item">View Staffs</a><br>
             <a href="staff_view.php" class="sub-item">Manage Staff</a>
         </div>
         <a href="#" class="menu-item">Medicines</a>
         <div class="submenu">
-        <a href="medicine_view.php" class="sub-item">Manage Medicines</a><br>
-        <a href="medicine_category.php" class="sub-item">Manage Categories</a><br>
-        <a href="medicine_brands.php" class="sub-item">Manage Brands</a><br>
+            <a href="medicine_view.php" class="sub-item">Manage Medicines</a><br>
+            <a href="medicine_category.php" class="sub-item">Manage Categories</a><br>
+            <a href="medicine_brands.php" class="sub-item">Manage Brands</a><br>
         </div>
         <a href="#" class="menu-item">Manage Delivery Team</a>
         <div class="submenu">
@@ -342,19 +330,86 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             <a href="assign_delivery.php" class="sub-item">Assign Orders</a><br>
         </div>
     </div>
-<div class="content">
-    <form action="" method="POST">
-        <div class="form-group">
-            <label for="brand_name">Brand Name<span style="color: red;">*</span>:</label>
-            <input type="text" class="form-control" id="brand_name" name="brand_name" required>
-        </div>
-        <div class="form-group">
-            <label for="brand_details">Description:<span style="color: red;">*</span>:</label>
-            <textarea class="form-control" id="brand_details" name="brand_details" rows="4" required></textarea>
-        </div>
-        <button type="submit" class="btn btn-primary">Add Brand</button>
-    </form>
-</div>
+
+    <!-- Add Medicines Management Table and Add Medicine Link -->
+    <div class="container">
+        <h2>Medicines</h2>
+        <a href="add_medicine.php" class="btn btn-primary mb-3">Add Stock</a>
+        <div class="table-container">
+        <table class="table">
+        <thead>
+            <tr>
+                <th>Sl No.</th>
+                <th>Medicine Name</th>
+                <th>Generic Name</th>
+                <th>Brand Name</th>
+                <th>Batch Number</th>
+                <th>Manufacturing Date</th>
+                <th>Expiry Date</th>
+                <th>Specification</th>
+                <th>Category Name</th>
+                <th>HSN Code</th> <!-- Added HSN Code column -->
+                <th>Tax Rate</th> <!-- Added Tax Rate column -->
+                <th>Tax Category</th> <!-- Added Tax Category column -->
+                <th>Stock</th>
+                <th>Price</th>
+                <th>Prescription</th>
+                <th>Images</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            <?php
+                $sql = "SELECT m.*, c.Category_name, b.Brand_name FROM medicines m
+                        LEFT JOIN category_details c ON m.Category_id = c.Category_id
+                        LEFT JOIN brand_details b ON m.Brand_id = b.Brand_id
+                        ORDER BY m.Med_name";
+                $result = $conn->query($sql);
+
+                // Counter for serial number
+                $slNo = 1;
+
+                while ($row = $result->fetch_assoc()) {
+                    echo "<tr>";
+                    
+                    echo "<td>" . $slNo . "</td>"; // Display serial number
+                    $slNo++; // Increment serial number for the next row
+
+                    echo "<td>" . $row["Med_name"] . "</td>";
+                    echo "<td>" . $row["generic_name"] . "</td>";
+                    echo "<td>" . $row["Brand_name"] . "</td>";
+                    echo "<td>" . $row["Batchno"] . "</td>";
+                    echo "<td>" . $row["Manuf_date"] . "</td>";
+                    echo "<td>" . $row["Exp_date"] . "</td>";
+                    echo "<td>" . $row["Specification"] . "</td>";
+                    echo "<td>" . $row["Category_name"] . "</td>";
+                    echo "<td>" . $row["HSN_Code"] . "</td>"; // Display HSN Code
+                    echo "<td>" . $row["Tax_Rate"] . "%</td>"; // Display Tax Rate
+                    echo "<td>" . $row["Tax_Category"] . "</td>"; // Display Tax Category
+                    echo "<td>" . $row["Stock"] . "</td>";
+                    echo "<td>" . $row["Price"] . "</td>";
+                    echo "<td>" . $row["Prescription"] . "</td>";
+                    echo "<td><img src='data:image/jpeg;base64," . base64_encode($row['Images']) . "' alt='Medicine Image' style='max-width:100px; max-height:100px;'></td>";
+                    echo "<td>";
+                    
+                    if ($row["Status"] == 1) {
+                        echo "<div class='action-buttons'>";
+                        echo "<a href='edit_medicine.php?id=" . $row["Med_id"] . "' class='btn btn-primary btn-sm'>Edit</a>";
+                        echo "<button class='btn btn-danger btn-sm delete-btn' data-medicine-id='" . $row["Med_id"] . "'>Disable</button>";
+                        echo "</div>";
+                    } else {
+                        echo "<div class='action-buttons'>";
+                        echo "<a href='edit_medicine.php?id=" . $row["Med_id"] . "' class='btn btn-primary btn-sm'>Edit</a>&nbsp";
+                    }
+                    echo "</td>";
+                    echo "</tr>";
+                }
+            ?>
+        </tbody>
+    </table>
+    </div>            
+    </div>
+
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script>
       document.addEventListener("DOMContentLoaded", function() {
@@ -385,23 +440,18 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
               });
           });
         });
+        $(document).ready(function () {
+            // Add click event listener to each delete button
+            $(".delete-btn").on("click", function (event) {
+                event.preventDefault();
+                var medicineId = $(this).data("medicine-id");
 
-        $(document).ready(function() {
-    $('form').submit(function(event) {
-        var brand_name = $('#brnd_name').val();
-        var brand_details = $('#brand_details').val();
-        if (category_name == '') {
-            $('#brand_name').after('<div class="alert alert-danger">Please enter a brand name</div>');
-            event.preventDefault();
-        }
-        if (category_details == '') {
-            $('#brand_details').after('<div class="alert alert-danger">Please enter brand details</div>');
-            event.preventDefault();
-        }
-    });
-});     
+                // Directly redirect to update_status.php with medicineId as a parameter
+                window.location.href = "manage_medicines.php?id=" + medicineId;
+            });
+        });
     </script>
-    </body>
+</body>
 </html>
 
 
