@@ -314,21 +314,57 @@ if (!isset($_SESSION['admin'])) {
 </div>
 
     <!-- Add Medicines Management Table and Add Medicine Link -->
-<div class="container">
+    <div class="container">
     <h2>Team Members</h2>
     <a href="add_members.php" class="btn btn-primary mb-3">Add Member</a>
     <table class="table">
-    <thead>
-        <tr>
-            
-        </tr>
-    </thead>
-    <tbody>
-    
+        <thead>
+            <tr>
+                <th>Sl. No</th>
+                <th>Name</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            <?php
+            // Include database configuration
+            include 'db_config.php';
 
+            // Fetch team members' first name and last name from the delivery_members table where status is 1
+            $sql = "SELECT first_name, last_name FROM delivery_members WHERE status = 1";
+            $result = $conn->query($sql);
+
+            // Check if any team members exist
+            if ($result->num_rows > 0) {
+                $count = 1; // Initialize serial number count
+                // Output data of each row
+                while ($row = $result->fetch_assoc()) {
+                    ?>
+                    <tr>
+                        <td><?php echo $count++; ?></td>
+                        <td><?php echo $row['first_name'] . ' ' . $row['last_name']; ?></td>
+                        <td>
+                            <a href="#" class="btn btn-success">View</a>
+                            <a href="#" class="btn btn-danger">Remove</a>
+                        </td>
+                    </tr>
+                    <?php
+                }
+            } else {
+                // If no team members found with status 1
+                ?>
+                <tr>
+                    <td colspan="3">No active team members found</td>
+                </tr>
+                <?php
+            }
+            // Close database connection
+            $conn->close();
+            ?>
     </tbody>
-    </table>   
-</div>
+    </table>
+    </div>
+
  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script>
       document.addEventListener("DOMContentLoaded", function() {

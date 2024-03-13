@@ -272,7 +272,7 @@ if (!isset($_SESSION['admin'])) {
         <h2>Add Member</h2>
         <form id="addMember " action="process_members.php" method="POST" onsubmit="return validateForm()">
             <label for="username">Username<span style="color: red;">*</span>:</label>
-            <input type="text" id="username" name="username" required>
+            <input type="email" id="username" name="username" required>
 
             <label for="firstName">First Name<span style="color: red;">*</span>:</label>
             <input type="text" id="firstName" name="firstName" required>
