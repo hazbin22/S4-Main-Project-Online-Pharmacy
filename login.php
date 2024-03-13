@@ -67,7 +67,25 @@
             }
         }
 
+        // Retrieve hashed password from the database for delivery members
+        $delivery_sql = "SELECT * FROM delivery_members WHERE username='$username' AND status=1";
+        $delivery_result = $conn->query($delivery_sql);
 
+        if (!$delivery_result) {
+            die("Delivery SQL query failed: " . $conn->error);
+        }
+
+        if ($delivery_result->num_rows > 0) {
+            $delivery_row = $delivery_result->fetch_assoc();
+            
+            // Verify the password using password_verify
+            if (password_verify($password, $delivery_row['password'])) {
+                // Delivery member login successful
+                $_SESSION['delivery_username'] = $username;
+                header('Location: delivery_team.php');
+                exit();
+            }
+        }
 
         // Admin credentials (assuming you store hashed admin password in the database)
         $admin_username = "admin";
