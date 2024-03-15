@@ -331,7 +331,7 @@ if (!isset($_SESSION['admin'])) {
             include 'db_config.php';
 
             // Fetch team members' first name and last name from the delivery_members table where status is 1
-            $sql = "SELECT first_name, last_name FROM delivery_members WHERE status = 1";
+            $sql = "SELECT first_name, last_name, member_id FROM delivery_members WHERE status = 1";
             $result = $conn->query($sql);
 
             // Check if any team members exist
@@ -344,9 +344,10 @@ if (!isset($_SESSION['admin'])) {
                         <td><?php echo $count++; ?></td>
                         <td><?php echo $row['first_name'] . ' ' . $row['last_name']; ?></td>
                         <td>
-                            <a href="#" class="btn btn-success">View</a>
-                            <a href="#" class="btn btn-danger">Remove</a>
+                            <a href="member.php?id=<?php echo $row['member_id']; ?>" class="btn btn-success">View</a>
+                            <a href="remove_member.php?id=<?php echo $row['member_id']; ?>" class="btn btn-danger">Remove</a>
                         </td>
+
                     </tr>
                     <?php
                 }
