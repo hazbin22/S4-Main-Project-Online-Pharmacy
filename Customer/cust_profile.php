@@ -61,20 +61,19 @@ $conn->close();
     <link rel="stylesheet" href="styles.css">
     <style>
         body {
-            font-family: Arial, sans-serif;
+            font-family: 'Roboto', sans-serif;
             background-color: #f2f2f2;
+            margin: 0;
+            padding: 0;
         }
-
         .container {
-            max-width: 400px;
-            margin: 0 auto;
-            padding: 20px;
-            background-color: white;
+            max-width: 800px;
+            margin: 50px auto;
+            background-color: #fff;
             border-radius: 5px;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-            margin-top: 50px;
+            padding: 20px;
         }
-
         form {
             display: flex;
             flex-direction: column;
@@ -104,6 +103,52 @@ $conn->close();
 
         button:hover {
             background-color: #45a049;
+        }
+        h2 {
+            color: #333;
+        }
+
+        a {
+            color: #007bff;
+            text-decoration: none;
+            margin-bottom: 20px;
+            display: inline-block;
+        }
+
+        p {
+            margin-bottom: 10px;
+        }
+
+        label {
+            font-weight: bold;
+            margin-bottom: 5px;
+            display: block;
+        }
+
+        .profile-info {
+            margin-bottom: 20px;
+        }
+
+        .profile-info p {
+            margin-bottom: 5px;
+        }
+        .update-profile-button {
+            margin-top: 20px;
+        }
+
+        .update-profile-button a button {
+            background-color: black;
+            color: white;
+            padding: 15px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 18px;
+            transition: background-color 0.3s ease;
+        }
+
+        .update-profile-button a button:hover {
+            background-color: #333; /* Change to the desired light color */
         }
 
     </style>
@@ -145,14 +190,62 @@ $conn->close();
         </nav>
       </div>
     </header>
-    
-
     <div class="container">
         <h2>Customer Profile</h2>
-        <a href="edit_profile.php">Edit Profile</a>
-        <p>Username: <?php echo $customer['username']; ?></p>
-        <p>First Name: <?php echo $customer['first_name']; ?></p>
-        <p>Last Name: <?php echo $customer['last_name']; ?></p>
+        <div class="profile-info">
+        <?php if (!empty($customer['username'])): ?>
+            <p><strong>Username:</strong> <?php echo $customer['username']; ?></p>
+        <?php endif; ?>
+
+        <?php if (!empty($customer['first_name'])): ?>
+            <p><strong>First Name:</strong> <?php echo $customer['first_name']; ?></p>
+        <?php endif; ?>
+
+        <?php if (!empty($customer['last_name'])): ?>
+            <p><strong>Last Name:</strong> <?php echo $customer['last_name']; ?></p>
+        <?php endif; ?>
+
+        <?php if (!empty($customer['gender'])): ?>
+            <p><strong>Gender:</strong> <?php echo $customer['gender']; ?></p>
+        <?php endif; ?>
+
+        <?php if (!empty($customer['dob'])): ?>
+            <p><strong>Date of Birth:</strong> <?php echo $customer['dob']; ?></p>
+        <?php endif; ?>
+
+        <?php if (isset($customer['building_or_house']) && !empty($customer['building_or_house'])): ?>
+            <p><strong>Building or House:</strong> <?php echo $customer['building_or_house']; ?></p>
+        <?php endif; ?>
+
+        <?php if (isset($customer['street']) && !empty($customer['street'])): ?>
+            <p><strong>Street:</strong> <?php echo $customer['street']; ?></p>
+        <?php endif; ?>
+
+        <?php if (isset($customer['city']) && !empty($customer['city'])): ?>
+            <p><strong>City:</strong> <?php echo $customer['city']; ?></p>
+        <?php endif; ?>
+
+        <?php if (isset($customer['district']) && !empty($customer['district'])): ?>
+            <p><strong>District:</strong> <?php echo $customer['district']; ?></p>
+        <?php endif; ?>
+
+        <?php if (isset($customer['pincode']) && !empty($customer['pincode'])): ?>
+            <p><strong>Pincode:</strong> <?php echo $customer['pincode']; ?></p>
+        <?php endif; ?>
+
+        <?php if (isset($customer['phone']) && !empty($customer['phone'])): ?>
+            <p><strong>Phone:</strong> <?php echo $customer['phone']; ?></p>
+        <?php endif; ?>
+
+        <?php if (empty($customer['username']) && empty($customer['first_name']) && empty($customer['last_name']) && empty($customer['gender']) && empty($customer['dob']) && empty($customer['building_or_house']) && empty($customer['street']) && empty($customer['city']) && empty($customer['district']) && empty($customer['pincode']) && empty($customer['phone'])): ?>
+            <p>No profile details found. <a href="edit_profile.php">Update your profile</a>.</p>
+        <?php endif; ?>
+    </div>
+    <div class="update-profile-button">
+        <a href="edit_profile.php">
+            <button type="button">Update Profile</button>
+        </a>
+    </div>
     </div>
 </body>
 
