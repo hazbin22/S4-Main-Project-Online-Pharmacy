@@ -48,6 +48,7 @@ $conn->close();
 
         <!--owl slider stylesheet -->
         <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/OwlCarousel2/2.3.4/assets/owl.carousel.min.css" />
+        <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
 
         <!-- font awesome style -->
         <link href="css/font-awesome.min.css" rel="stylesheet" />
@@ -150,6 +151,43 @@ $conn->close();
         .update-profile-button a button:hover {
             background-color: #333; /* Change to the desired light color */
         }
+        .product-header {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+    }
+
+    .submenu1 {
+        display: none;
+        position: absolute;
+        background-color: #ffffff;
+        box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
+        z-index: 1;
+        list-style: none;
+        padding: 0;
+        text-align: left;
+    }
+
+    .nav-item:hover .submenu1 {
+        display: block;
+    }
+
+    .submenu1 .nav-item {
+        width: 200px;
+        padding: 10px;
+    }
+
+    .submenu1 .nav-link {
+        color: #000; /* Set text color to black */
+        text-decoration: none;
+        display: block;
+        padding: 8px 16px; /* Add padding for better spacing */
+        font-size: 14px; /* Reduce font size */
+    }
+
+    .submenu1 .nav-link:hover {
+        background-color: #f2f2f2;
+    }
 
     </style>
 </head>
@@ -157,39 +195,41 @@ $conn->close();
 <body>
 
      <!-- header section strats -->
-    <header class="header_section">
-      <div class="container-fluid">
-        <nav class="navbar navbar-expand-lg custom_nav-container ">
-          <a class="navbar-brand" href="index.php">
-            <span>
-              PHARMIO
-            </span>
-          </a>
-
-          
-
-          <div class="collapse navbar-collapse" id="navbarSupportedContent">
-            <ul class="navbar-nav  ">
-              <li class="nav-item active">
-                <a class="nav-link" href="index.php">Home <span class="sr-only">(current)</span></a>
-              </li>
-              <li class="nav-item">
-                <a class="nav-link" href="">About</a>
-              </li>
-              <li class="nav-item">
-                <a class="nav-link" href="">SHOP</a>
-              <li class="nav-item">
-                <a class="nav-link" href="register.php">REGISTER</a>
-              </li>
-              <li class="nav-item">
-                <a class="nav-link" href="login.php"> <i class="fa fa-user" aria-hidden="true"></i> Login</a>
-              </li>
-              
+    
+<header class="header_section"> 
+    <div class="container-fluid">
+    <nav class="navbar navbar-expand-lg custom_nav-container ">
+        <a class="navbar-brand" href="customer.php">
+        <span>
+            PHARMIO
+        </span>
+        </a>
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+            <ul class="navbar-nav">
+            <li>
+            <div class="search-container">
+            </div>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="#"><i class="fas fa-user"></i> <?php echo htmlspecialchars($_SESSION['first_name']); ?><i class="fas fa-angle-down"></i></a>
+                <ul class="submenu1">
+                    <li class="nav-item">
+                        <a class="nav-link" href="cust_profile.php"><i class="fas fa-user"></i> My Profile</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="cart.php"><i class="fas fa-shopping-cart"></i> My Cart</a>
+                    </li>
+                </ul>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="logout.php"><i class="fas fa-sign-out-alt"></i> Log Out</a>
+            </li>
             </ul>
-          </div>
-        </nav>
-      </div>
-    </header>
+        </div>
+    </nav>
+    </div>
+</header>
+
     <div class="container">
         <h2>Customer Profile</h2>
         <div class="profile-info">
