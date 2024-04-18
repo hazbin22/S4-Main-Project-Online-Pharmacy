@@ -1,27 +1,83 @@
 <?php
-include('db_config.php');
-session_start();
+    include('db_config.php');
+    session_start();
 
-if (!isset($_SESSION['username'])) {
-    header('Location: login.php');
-    exit();
-}
+    if (!isset($_SESSION['username'])) {
+        header('Location: login.php');
+        exit();
+    }
 
-// Fetch user details from the database based on the username stored in the session
-$username = $_SESSION['username'];
-$sql = "SELECT * FROM customer_details WHERE username = '$username'";
-$result = $conn->query($sql);
+    // Fetch user details from the database based on the username stored in the session
+    $username = $_SESSION['username'];
+    $sql = "SELECT * FROM customer_details WHERE username = '$username'";
+    $result = $conn->query($sql);
 
-if ($result->num_rows > 0) {
-    $row = $result->fetch_assoc();
-    $first_name = $row['first_name'];
-    $last_name = $row['last_name'];
-} else {
-    // Handle the case where user details are not found in the database
-    $first_name = "";
-    $last_name = "";
-}
+    if ($result->num_rows > 0) {
+        $row = $result->fetch_assoc();
+        $customer_id = $row['customer_id'];
+        $first_name = $row['first_name'];
+        $last_name = $row['last_name'];
+        $gender = $row['gender'];
+        $dob = $row['dob'];
+    } else {
+        // Handle the case where user details are not found in the database
+        $first_name = "";
+        $last_name = "";
+        $gender = "";
+        $dob = "";
+    }
 
+    // Fetch address details from the address_details table
+    $sqlAddress = "SELECT * FROM address_details WHERE address_id = (SELECT address_id FROM customer_details WHERE username = '$username')";
+    $resultAddress = $conn->query($sqlAddress);
+
+    if ($resultAddress->num_rows > 0) {
+        $rowAddress = $resultAddress->fetch_assoc();
+        $building_or_house = $rowAddress['building_or_house'];
+        $street = $rowAddress['street'];
+        $city = $rowAddress['city'];
+        $district = $rowAddress['district'];
+        $pincode = $rowAddress['pincode'];
+        $phone = $rowAddress['phone'];
+    } else {
+        // Handle the case where address details are not found in the database
+        $building_or_house = "";
+        $street = "";
+        $city = "";
+        $district = "";
+        $pincode = "";
+        $phone = "";
+    }
+
+    // Check if the form is submitted for updating the profile
+    if ($_SERVER["REQUEST_METHOD"] == "POST") {
+        // ... (Your existing code for getting form data)
+
+        // Insert or update address_details table
+        $existingAddressId = $row['address_id'];
+
+        if ($existingAddressId) {
+            // Address already exists, update it
+            $updateAddressSQL = "UPDATE address_details SET building_or_house = '$newBuildingOrHouse', street = '$newStreet', city = '$newCity', district = '$newDistrict', pincode = '$newPincode', phone = '$newPhone' WHERE address_id = $existingAddressId";
+        } else {
+            // Address doesn't exist, insert it
+            $insertAddressSQL = "INSERT INTO address_details (building_or_house, street, city, district, pincode, phone) VALUES ('$newBuildingOrHouse', '$newStreet', '$newCity', '$newDistrict', '$newPincode', '$newPhone')";
+            $conn->query($insertAddressSQL);
+            $existingAddressId = $conn->insert_id; // Get the ID of the newly inserted address
+        }
+
+        // Update customer_details table
+        $updateCustomerSQL = "UPDATE customer_details SET first_name = '$newFirstName', last_name = '$newLastName', gender = '$newGender', dob = '$newDob', address_id = $existingAddressId WHERE customer_id = $customer_id";
+        $conn->query($updateCustomerSQL);
+
+        // Display a success message
+        $successMessage = "Profile updated";
+
+        // Redirect to the profile page after updating
+        // You can also include the success message as a query parameter and display it on the profile page
+        header("Location: edit_profile.php?successMessage=" . urlencode($successMessage));
+        exit();
+    }
 ?>
 <!DOCTYPE html>
 <html>
@@ -64,66 +120,18 @@ if ($result->num_rows > 0) {
   <link href="css/responsive.css" rel="stylesheet" />
   <style>
     .logout-button {
-        background-color: #007bff;
-        color: white;
-        border: none;
-        padding: 10px 20px;
-        border-radius: 5px;
-        cursor: pointer;
-        transition: background-color 0.3s ease;
-    }
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
 
-    .logout-button:hover {
-        background-color: #0056b3;
-    }
-
-    .product-list {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: flex-start;
-    padding: 20px;
-}
-
-.product-card {
-    width: 250px;
-    border: 1px solid #ddd;
-    border-radius: 8px;
-    padding: 20px;
-    margin: 10px;
-    text-align: center;
-    overflow-wrap: break-word; 
-}
-
-.product-card img {
-    max-width: 100%;
-    height: auto;
-    margin-bottom: 10px;
-}
-
-.product-card h3 {
-    font-size: 18px;
-    margin-bottom: 10px;
-}
-
-.product-card p {
-    font-size: 14px;
-    margin-bottom: 8px;
-}
-
-.product-card button {
-    background-color: #007bff;
-    color: #fff;
-    border: none;
-    padding: 10px 20px;
-    border-radius: 5px;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-}
-
-.product-card button:hover {
-    background-color: #0056b3;
-}
-
+        .logout-button:hover {
+            background-color: #0056b3;
+        }
 
         .submenu1 {
             display: none;
@@ -157,38 +165,69 @@ if ($result->num_rows > 0) {
             background-color: #f2f2f2;
         }
 
+        /* Form container styles */
         .profile-container {
             background-color: #ffffff;
             border-radius: 10px;
             padding: 20px;
-            text-align: center;
-            max-width: 400px;
-            width: 100%;
-        }
-
-        .profile-info {
             text-align: left;
-            margin-bottom: 20px;
+            max-width: 600px;
+            margin: 0 auto;
         }
 
+        /* Navigation link styles */
+        .navbar-nav .nav-item.active .nav-link,
+        .navbar-nav .nav-link {
+            color: #000 !important; /* Set text color to black */
+        }
+
+        /* Navigation link hover styles */
+        .navbar-nav .nav-item.active .nav-link:hover,
+        .navbar-nav .nav-link:hover {
+            color: #000 !important; /* Set hover text color to black */
+        }
+
+        /* Form input styles */
         .profile-info div {
-            margin-bottom: 10px;
+            margin-bottom: 15px;
+        }
+
+        /* Label styles */
+        .profile-info label {
+            display: block;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        /* Input styles */
+        .profile-info input,
+        .profile-info select,
+        .profile-info textarea {
+            width: 100%;
+            padding: 10px;
+            box-sizing: border-box;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 14px;
+            margin-top: 5px;
         }
 
         .edit-profile-button {
-            background-color: #007bff;
-            color: #fff;
+            background-color: #000; /* Set background color to black */
+            color: #fff; /* Set text color to white */
             border: none;
             border-radius: 5px;
             padding: 10px 20px;
             cursor: pointer;
             transition: background-color 0.3s ease;
+            font-size: 16px;
         }
 
         .edit-profile-button:hover {
-            background-color: #0056b3;
+            background-color: #333; /* Darken the background color on hover */
         }
 
+        /* Responsive styles for smaller screens */
         @media (max-width: 768px) {
             .profile-container {
                 width: 80%;
@@ -218,14 +257,8 @@ if ($result->num_rows > 0) {
           </a>
           <div class="collapse navbar-collapse" id="navbarSupportedContent">
               <ul class="navbar-nav">
-                  <li class="nav-item active">
-                      <a class="nav-link" href="customer.php">Home <span class="sr-only">(current)</span></a>
-                  </li>
                   <li class="nav-item">
-                      <a class="nav-link" href="#">About</a>
-                  </li>
-                  <li class="nav-item">
-                      <a class="nav-link" href="#"><i class="fas fa-user"></i> Account <i class="fas fa-angle-down"></i></a>
+                  <a class="nav-link" href="#"><i class="fas fa-user"></i> <?php echo htmlspecialchars($_SESSION['first_name']); ?><i class="fas fa-angle-down"></i></a>
                       <ul class="submenu1">
                           <li class="nav-item">
                               <a class="nav-link" href="edit_profile.php"><i class="fas fa-user"></i> My Profile</a>
@@ -248,19 +281,62 @@ if ($result->num_rows > 0) {
     </header>
 
     <div class="profile-container">
-    <div class="profile-info">
-        <div><strong>Username:</strong> <?php echo $_SESSION['username']; ?></div>
-        <div><strong>First Name:</strong> <?php echo $first_name; ?></div>
-        <div><strong>Last Name:</strong> <?php echo $last_name; ?></div>
-    </div>
-    <button class="edit-profile-button">Edit Profile</button>
-  </div>
-
-
-      <?php
- 
-      ?>
-
-    </div> 
+    <form method="post" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>">
+        <div class="profile-info">
+            <div><strong>Username:</strong> <?php echo $_SESSION['username']; ?></div>
+            <div>
+                <label for="new_first_name">First Name:</label>
+                <input type="text" id="new_first_name" name="new_first_name" value="<?php echo $first_name; ?>" required>
+            </div>
+            <div>
+                <label for="new_last_name">Last Name:</label>
+                <input type="text" id="new_last_name" name="new_last_name" value="<?php echo $last_name; ?>" required>
+            </div>
+            <div>
+            <label for="new_gender">Gender:</label>
+                <select id="new_gender" name="new_gender" required>
+                    <option value="Male" <?php echo ($gender === 'Male') ? 'selected' : ''; ?>>Male</option>
+                    <option value="Female" <?php echo ($gender === 'Female') ? 'selected' : ''; ?>>Female</option>
+                    <option value="Other" <?php echo ($gender === 'Other') ? 'selected' : ''; ?>>Other</option>
+                </select>
+            </div>
+            <div>
+                <label for="new_dob">Date of Birth:</label>
+                <input type="date" id="new_dob" name="new_dob" value="<?php echo $dob; ?>" required>
+            </div>
+            <div>
+                <label for="new_building_or_house">Building or House:</label>
+                <input type="text" id="new_building_or_house" name="new_building_or_house" value="<?php echo $building_or_house; ?>" required>
+            </div>
+            <div>
+                <label for="new_street">Street:</label>
+                <input type="text" id="new_street" name="new_street" value="<?php echo $street; ?>" required>
+            </div>
+            <div>
+                <label for="new_city">City:</label>
+                <input type="text" id="new_city" name="new_city" value="<?php echo $city; ?>" required>
+            </div>
+            <div>
+                <label for="new_district">District:</label>
+                <input type="text" id="new_district" name="new_district" value="<?php echo $district; ?>" required>
+            </div>
+            <div>
+                <label for="new_pincode">Pincode:</label>
+                <input type="text" id="new_pincode" name="new_pincode" value="<?php echo $pincode; ?>" required>
+            </div>
+            <div>
+                <label for="new_phone">Phone:</label>
+                <input type="text" id="new_phone" name="new_phone" value="<?php echo $phone; ?>" required>
+            </div>
+        </div>
+        <button type="submit" class="edit-profile-button">Update Profile</button>
+    </form>
+</div>
+<?php
+    if (isset($_GET['successMessage'])) {
+        $successMessage = htmlspecialchars($_GET['successMessage']);
+        echo "<div style='background-color: #4CAF50; color: white; padding: 10px; text-align: center;'>$successMessage</div>";
+    }
+?>
 </body>
 </html>
