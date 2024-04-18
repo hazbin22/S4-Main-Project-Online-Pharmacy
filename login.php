@@ -77,11 +77,11 @@
 
         if ($delivery_result->num_rows > 0) {
             $delivery_row = $delivery_result->fetch_assoc();
-            
+
             // Verify the password using password_verify
             if (password_verify($password, $delivery_row['password'])) {
                 // Delivery member login successful
-                $_SESSION['delivery_username'] = $username;
+                $_SESSION['delivery_member_id'] = $delivery_row['member_id']; // Set delivery member ID in session
                 header('Location: delivery_team.php');
                 exit();
             }
@@ -115,35 +115,36 @@
     <title>Login</title>
     <style>
         #bg {
+            background-color: #f2f2f2; /* Light black color for background */
             background-repeat: no-repeat;
-            background-image: url("images/img5.jpg");
             background-size: cover;
             background-position: top;
             background-attachment: fixed;
         }
         body {
             font-family: Arial, Helvetica, sans-serif;
-            background-color: #f2f2f2;
             margin: 0;
             padding: 0;
             display: flex;
             justify-content: center;
             align-items: center;
             min-height: 100vh;
+            color: #000; /* Set text color to black */
         }
         .container {
-            background-color: rgba(255, 255, 255, 0.46);
+            background-color: white;
             border-radius: 5px;
             box-shadow: 0px 0px 10px 0px #888888;
             width: 80%;
             max-width: 400px;
             padding: 20px;
             box-sizing: border-box;
+            color: #000; /* Set text color to black */
         }
         h2 {
             text-align: center;
             margin-bottom: 20px;
-            color: #333;
+            color: #000; /* Set text color to black */
         }
         form {
             display: flex;
@@ -158,11 +159,12 @@
             width: 94%;
             padding: 10px;
             margin-bottom: 15px;
-            border: 1px solid #ccc;
+            border: 1px solid #000; /* Set border color to black */
             border-radius: 3px;
+            color: #000; /* Set text color to black */
         }
         input[type="submit"] {
-            background-color: #6EB5FF;
+            background-color: #000; /* Set background color to black */
             color: white;
             padding: 10px 20px;
             border: none;
@@ -172,10 +174,10 @@
             font-weight: bold;
         }
         input[type="submit"]:hover {
-            background-color: #287bd4;
+            background-color: #333; /* Darker shade of black on hover */
         }
         .error-message {
-            color: #ff0000;
+            color: red; /* Set error message color to red */
             margin-top: -15px;
             margin-bottom: 10px;
             font-size: 14px;
@@ -183,10 +185,12 @@
         .register-link {
             text-align: center;
             margin-top: 10px;
+            color: #000; /* Set text color to black */
         }
         .forgot-password-link {
             text-align: center;
             margin-top: 0px;
+            color: #000; /* Set text color to black */
         }
         .google-signup {
             text-align: center;
@@ -221,7 +225,7 @@
     </style>
 </head>
 <body id="bg">`
-    <div class="container">
+<div class="container">
         <h2>Login</h2>
         
         <form action="" method="post"> 
@@ -237,9 +241,6 @@
         </form>
         <br>
         <p class="register-link">Don't have an account? <a href="register.php">Register here</a></p>
-        <!-- <div class="google-signup">
-            <a href="<?= $login_url ?>"><img src="https://tinyurl.com/46bvrw4s" alt="Google Logo"> Sign up with Google</a>
-        </div> -->
     </div>
     
     <script>
