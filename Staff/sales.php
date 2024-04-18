@@ -263,32 +263,6 @@
     <div class="container">
     <!-- Top Section -->
     <div class="row">
-          <div>
-              <label for="name">Name:</label>
-              <input type="text" id="name" name="name" placeholder="Enter Name">
-          </div>
-          <div>
-              <label for="referedBy">Refered By:</label>
-              <input type="text" id="referedBy" name="referedBy" placeholder="Enter Refered By">
-          </div>
-          <div>
-              <label for="consumptionDays">Consumption Days:</label>
-              <input type="text" id="consumptionDays" name="consumptionDays" placeholder="Enter Consumption Days">
-          </div>
-          <div>
-              <label for="address">Address:</label>
-              <input type="text" id="address" name="address" placeholder="Enter Address">
-          </div>
-          <div>
-              <label for="checkedBy">Checked By:</label>
-              <input type="text" id="checkedBy" name="checkedBy" placeholder="Enter Checked By">
-          </div>
-          <div>
-              <label for="date">Return Date:</label>
-              <input type="date" id="date" name="date">
-          </div>
-      </div>
-
       <!-- Table Section -->
       <table>
           <thead>
@@ -303,62 +277,29 @@
                   <th>Total Amount</th>
               </tr>
           </thead>
-          <tbody id="tableBody"></tbody>
-      </table><br>
+          <tbody id="tableBody"></tbody><br>
+      </table>
       <div class="table-buttons">
-          <button onclick="addRow()">Add</button>
+          <br><button onclick="addRow()">Add</button>
           <button onclick="proceedToDatabase()">Proceed</button>
       </div>
   </div>
 
       <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.13/jspdf.plugin.autotable.min.js"></script>
       <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.4.0/jspdf.umd.min.js"></script>
+
       <script>
         const tbody = document.getElementById('tableBody');
-
-        for (let i = 0; i < 1; i++) { // Change 5 to the desired number of rows
-            const row = document.createElement('tr');
-
-            for (let j = 0; j < 8; j++) { // 8 cells in each row
-                const cell = document.createElement('td');
-                cell.contentEditable = true;
-
-                // Add oninput event to the cells in the "Product Name" column
-                if (j === 1) {
-                    const inputField = document.createElement('input');
-                    inputField.type = 'text';
-                    inputField.placeholder = 'Enter Product Name';
-                    inputField.addEventListener('input', function() {
-                        liveSearch(this);
-                    });
-                    cell.appendChild(inputField);
-                }
-
-                if (j === 6) { // Add oninput event to the "Quantity" column
-                    const inputField = document.createElement('input');
-                    inputField.type = 'text';
-                    inputField.placeholder = 'Enter Quantity';
-                    inputField.addEventListener('input', function() {
-                        updateTotalAmount(this);
-                    });
-                    cell.appendChild(inputField);
-                } else if (j === 7) { // "Total Amount" column, initially set to 0
-                    const totalAmountField = document.createElement('span');
-                    totalAmountField.textContent = '0';
-                    cell.appendChild(totalAmountField);
-                }
-
-
-                row.appendChild(cell);
-            }
-
-            tbody.appendChild(row);
-        }
-
+        let rowCount = 1; // Initialize the row count
         function addRow() {
           const row = document.createElement('tr');
 
-          for (let j = 0; j < 8; j++) {
+          // Fill the serial number
+          const slNoCell = document.createElement('td');
+          slNoCell.textContent = rowCount; // Set the serial number
+          row.appendChild(slNoCell);
+
+          for (let j = 1; j < 8; j++) { // Start from 1 to skip the "Sl No" column
               const cell = document.createElement('td');
               cell.contentEditable = true;
 
@@ -366,7 +307,7 @@
                   const inputField = document.createElement('input');
                   inputField.type = 'text';
                   inputField.placeholder = 'Enter Product Name';
-                  inputField.addEventListener('input', function() {
+                  inputField.addEventListener('input', function () {
                       liveSearch(this);
                   });
                   cell.appendChild(inputField);
@@ -376,7 +317,7 @@
                   const inputField = document.createElement('input');
                   inputField.type = 'text';
                   inputField.placeholder = 'Enter Quantity';
-                  inputField.addEventListener('input', function() {
+                  inputField.addEventListener('input', function () {
                       updateTotalAmount(this);
                   });
                   cell.appendChild(inputField);
@@ -390,79 +331,85 @@
           }
 
           tbody.appendChild(row);
+
+          rowCount++; // Increment the row count for the next row
       }
 
-      function liveSearch(inputField) {
-          const productName = inputField.value.trim();
-          const currentRow = inputField.parentNode.parentNode;
+        function liveSearch(inputField) {
+            const productName = inputField.value.trim();
+            const currentRow = inputField.parentNode.parentNode;
 
-          if (productName !== '') {
-              fetch('get_medicine_details.php?productName=' + encodeURIComponent(productName))
-                  .then(response => response.json())
-                  .then(data => {
-                      if (data.success) {
-                          currentRow.cells[2].innerText = data.productDetails.batchNo;
-                          currentRow.cells[3].innerText = data.productDetails.expiryDate;
-                          currentRow.cells[4].innerText = data.productDetails.unitPrice;
-                          currentRow.cells[5].innerText = data.productDetails.rate;
-                      } else {
-                          // Clear the entire row if product not found
-                          currentRow.querySelectorAll('td').forEach(cell => {
-                              cell.innerHTML = ''; // Clear the content of each cell
-                          });
-                          // Show error message if product not found
-                          const errorCell = currentRow.cells[1]; // Column index for product name
-                          errorCell.innerHTML = `<span class="error-message">Product not found</span>`;
-                      }
-                  })
-                  .catch(error => console.error('Error fetching data:', error));
+            if (productName !== '') {
+                fetch('get_medicine_details.php?productName=' + encodeURIComponent(productName))
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            currentRow.cells[2].innerText = data.productDetails.batchNo;
+                            currentRow.cells[3].innerText = data.productDetails.expiryDate;
+                            currentRow.cells[4].innerText = data.productDetails.unitPrice;
+                            currentRow.cells[5].innerText = data.productDetails.rate;
+                        } else {
+                            // Clear the entire row if product not found
+                            currentRow.querySelectorAll('td').forEach(cell => {
+                                cell.innerHTML = ''; // Clear the content of each cell
+                            });
+                            // Show error message if product not found
+                            const errorCell = currentRow.cells[1]; // Column index for product name
+                            errorCell.innerHTML = `<span class="error-message">Product not found</span>`;
+                        }
+                    })
+                    .catch(error => console.error('Error fetching data:', error));
+            }
+        }
+
+        function updateTotalAmount(inputField) {
+            const currentRow = inputField.parentNode.parentNode;
+            const quantity = parseFloat(inputField.value) || 0;
+            const rate = parseFloat(currentRow.cells[5].textContent) || 0;
+            const totalAmount = quantity * rate;
+            currentRow.cells[7].textContent = totalAmount.toFixed(2);
+        }
+
+        function proceedToDatabase() {
+        // Create a new instance of jsPDF
+        const pdf = new jsPDF();
+
+        // Extract table data from the HTML table
+        const tableData = [];
+        const rows = document.querySelectorAll('#tableBody tr');
+        rows.forEach(row => {
+          const rowData = [];
+          row.querySelectorAll('td').forEach(cell => {
+            rowData.push(cell.textContent);
+          });
+          tableData.push(rowData);
+        });
+
+        // Add table to the PDF
+        pdf.autoTable({
+          head: [['Sl No', 'Product Name', 'Batch No', 'Expiry Date', 'Unit Price', 'Rate', 'Quantity', 'Total Amount']],
+          body: tableData,
+          startY: 80,
+        });
+
+        // Calculate total amount
+        let totalAmount = 0;
+        tableData.forEach(row => {
+          const amount = parseFloat(row[7]);
+          if (!isNaN(amount)) {
+            totalAmount += amount;
           }
+        });
+
+        // Add total amount to the PDF
+        pdf.text(`Total Amount: ${totalAmount.toFixed(2)}`, 20, pdf.lastAutoTable.finalY + 10);
+
+        // Save the PDF
+        pdf.save('invoice.pdf');
       }
-
-      function updateTotalAmount(inputField) {
-          const currentRow = inputField.parentNode.parentNode;
-          const quantity = parseFloat(inputField.value) || 0;
-          const rate = parseFloat(currentRow.cells[5].textContent) || 0;
-          const totalAmount = quantity * rate;
-          currentRow.cells[7].textContent = totalAmount.toFixed(2);
-      }
-
-      function proceedToDatabase() {
-          const pdf = new jsPDF();
-
-          pdf.text('Invoice', 20, 10);
-          pdf.text(`Name: ${document.getElementById('name').value}`, 20, 20);
-          pdf.text(`Refered By: ${document.getElementById('referedBy').value}`, 20, 30);
-          pdf.text(`Consumption Days: ${document.getElementById('consumptionDays').value}`, 20, 40);
-          pdf.text(`Address: ${document.getElementById('address').value}`, 20, 50);
-          pdf.text(`Checked By: ${document.getElementById('checkedBy').value}`, 20, 60);
-          pdf.text(`Date: ${document.getElementById('date').value}`, 20, 70);
-
-          const tableData = [];
-          const rows = document.querySelectorAll('#tableBody tr');
-          rows.forEach(row => {
-              const rowData = [];
-              row.querySelectorAll('td').forEach(cell => {
-                  rowData.push(cell.textContent);
-              });
-              tableData.push(rowData);
-          });
-
-          pdf.autoTable({
-              head: [['Sl No', 'Product Name', 'Batch No', 'Expiry Date', 'Unit Price', 'Rate', 'Quantity', 'Total Amount']],
-              body: tableData,
-              startY: 80,
-          });
-
-          pdf.save('invoice.pdf');
-      }
+      window.addEventListener('DOMContentLoaded', addRow);
       </script>
-    </table><br>
-  <div class="table-buttons">
-    <!-- <button onclick="saveData()">Save</button> -->
-    <button onclick="proceedToDatabase()">Proceed</button>
-    <!-- <button onclick="printData()">Print</button> -->
-  </div>
+    </table>
 </div>
 </div>
 </body>
