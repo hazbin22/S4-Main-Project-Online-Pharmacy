@@ -93,7 +93,7 @@
                         Awaits You
                     </h1>
                     <p>
-                        Empowering lives through health solutions, [Your Pharmacy Name] is your trusted partner for a healthier tomorrow. Experience expert care, personalized guidance, and a world of wellness at your fingertips.
+                        Empowering lives through health solutions, Pharmio is your trusted partner for a healthier tomorrow. Experience expert care, personalized guidance, and a world of wellness at your fingertips.
                     </p>
                   </div>
                 </div>
@@ -234,13 +234,13 @@
               <a href="">
                 <i class="fa fa-phone" aria-hidden="true"></i>
                 <span>
-                  Call +01 1234567890
+                  Call +918281955282
                 </span>
               </a>
               <a href="">
                 <i class="fa fa-envelope" aria-hidden="true"></i>
                 <span>
-                  demo@gmail.com
+                  pharmio2024@gmail.com
                 </span>
               </a>
             </div>
