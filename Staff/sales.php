@@ -316,7 +316,7 @@
       <script>
         const tbody = document.getElementById('tableBody');
 
-        for (let i = 0; i < 5; i++) { // Change 5 to the desired number of rows
+        for (let i = 0; i < 1; i++) { // Change 5 to the desired number of rows
             const row = document.createElement('tr');
 
             for (let j = 0; j < 8; j++) { // 8 cells in each row
