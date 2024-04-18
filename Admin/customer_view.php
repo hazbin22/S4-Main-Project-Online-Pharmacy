@@ -368,13 +368,7 @@ if (!isset($_SESSION['admin'])) {
                       echo "<td>" . $row["first_name"] . "</td>";
                       echo "<td>" . $row["last_name"] . "</td>";
                       
-                      // Check the verify_status value and set button text and color accordingly
-                      if ($row["verify_status"] == 1) {
-                          echo "<td><button class='deactivate-button' data-username='" . $row["username"] . "'>Deactivate</button></td>";
-                      } else {
-                          echo "<td><button class='deactivate-button deactivated' data-username='" . $row["username"] . "'>Deactivated</button></td>";
-                      }
-                      
+                      echo "<td><a href='customer_details.php?username=" . $row["username"] . "' class='view-button'>View</a></td>";
                       echo "</tr>";
                   }
               } else {
