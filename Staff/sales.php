@@ -17,13 +17,14 @@
     <meta http-equiv="Expires" content="0">
 
 
-  <title> Pharmio </title>
+  <title>Pharmio</title>
 
   <!-- bootstrap core css -->
   <link rel="stylesheet" type="text/css" href="css/bootstrap.css"/>
 
   <!-- fonts style -->
   <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700;900&display=swap" rel="stylesheet">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.4.0/jspdf.umd.min.js"></script>
 
   <!--owl slider stylesheet -->
   <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/OwlCarousel2/2.3.4/assets/owl.carousel.min.css" />
@@ -223,6 +224,12 @@
           color: red;
           font-size: 12px;
       }
+      .pay h4 {
+        display: flex;
+        justify-content: flex-end;
+        margin-left: 800px;
+        margin-top: -50px;
+      }
 
   </style>    
   </head>
@@ -255,9 +262,9 @@
     </header>
     <!-- Sidebar -->
     <div class="sidebar">
-        <a href="sales_report.php" class="menu-item">Sales Report <span class="red-x">X</span></a>
+        <!-- <a href="sales_report.php" class="menu-item">Sales Report <span class="red-x">X</span></a> -->
         <a href="sales.php" class="menu-item">New Sale</a>
-        <a href="sales_return.php" class="menu-item">Return Medicine</a>
+        <!-- <a href="sales_return.php" class="menu-item">Return Medicine</a> -->
     </div>
     <!-- Sidebar Ends -->
     <div class="container">
@@ -284,9 +291,14 @@
           <button onclick="proceedToDatabase()">Proceed</button>
       </div>
   </div>
+  <div class="pay">
+      <div class="pay">
+        <h4>To Pay: <span id="totalToPay">0</span></h4>
+      </div>
+    </div>
 
-      <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.13/jspdf.plugin.autotable.min.js"></script>
       <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.4.0/jspdf.umd.min.js"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.13/jspdf.plugin.autotable.min.js"></script>
 
       <script>
         const tbody = document.getElementById('tableBody');
@@ -368,46 +380,59 @@
             const rate = parseFloat(currentRow.cells[5].textContent) || 0;
             const totalAmount = quantity * rate;
             currentRow.cells[7].textContent = totalAmount.toFixed(2);
+            updateTotalToPay();
+        }
+
+        function updateTotalToPay() {
+            let totalToPay = 0;
+            document.querySelectorAll('#tableBody tr').forEach(row => {
+                const totalAmount = parseFloat(row.cells[7].textContent) || 0;
+                totalToPay += totalAmount;
+            });
+            document.getElementById('totalToPay').textContent = totalToPay.toFixed(2);
         }
 
         function proceedToDatabase() {
-        // Create a new instance of jsPDF
-        const pdf = new jsPDF();
+            // Create a new instance of jsPDF
+            const pdf = new jspdf.jsPDF();
 
-        // Extract table data from the HTML table
-        const tableData = [];
-        const rows = document.querySelectorAll('#tableBody tr');
-        rows.forEach(row => {
-          const rowData = [];
-          row.querySelectorAll('td').forEach(cell => {
-            rowData.push(cell.textContent);
-          });
-          tableData.push(rowData);
-        });
+            // Extract table data from the HTML table
+            const tableData = [];
+            const rows = document.querySelectorAll('#tableBody tr');
+            rows.forEach(row => {
+                const rowData = [];
+                row.querySelectorAll('td').forEach(cell => {
+                    rowData.push(cell.textContent);
+                });
+                tableData.push(rowData);
+            });
 
-        // Add table to the PDF
-        pdf.autoTable({
-          head: [['Sl No', 'Product Name', 'Batch No', 'Expiry Date', 'Unit Price', 'Rate', 'Quantity', 'Total Amount']],
-          body: tableData,
-          startY: 80,
-        });
+            // Add table to the PDF
+            pdf.autoTable({
+                head: [['Sl No', 'Medicine Name', 'Batch No', 'Expiry Date', 'Unit Price', 'Rate', 'Quantity', 'Total Amount']],
+                body: tableData,
+                startY: 80,
+            });
 
-        // Calculate total amount
-        let totalAmount = 0;
-        tableData.forEach(row => {
-          const amount = parseFloat(row[7]);
-          if (!isNaN(amount)) {
-            totalAmount += amount;
-          }
-        });
+            // Calculate total amount
+            let totalAmount = 0;
+            tableData.forEach(row => {
+                const amount = parseFloat(row[7]);
+                if (!isNaN(amount)) {
+                    totalAmount += amount;
+                }
+            });
 
-        // Add total amount to the PDF
-        pdf.text(`Total Amount: ${totalAmount.toFixed(2)}`, 20, pdf.lastAutoTable.finalY + 10);
+            // Display total amount to be paid
+            document.getElementById('totalToPay').textContent = totalAmount.toFixed(2);
 
-        // Save the PDF
-        pdf.save('invoice.pdf');
-      }
-      window.addEventListener('DOMContentLoaded', addRow);
+            // Add total amount to the PDF
+            pdf.text(`Total Amount: ${totalAmount.toFixed(2)}`, 20, pdf.lastAutoTable.finalY + 10);
+
+            // Save the PDF
+            pdf.save('receipt.pdf');
+        }
+        window.addEventListener('DOMContentLoaded', addRow);
       </script>
     </table>
 </div>
