@@ -393,47 +393,50 @@
         }
 
         function proceedToDatabase() {
-            // Create a new instance of jsPDF
-            const pdf = new jspdf.jsPDF();
+          // Create a new instance of jsPDF
+          const pdf = new jspdf.jsPDF();
 
-            // Extract table data from the HTML table
-            const tableData = [];
-            const rows = document.querySelectorAll('#tableBody tr');
-            rows.forEach(row => {
-                const rowData = [];
-                row.querySelectorAll('td').forEach(cell => {
-                    rowData.push(cell.textContent);
-                });
-                tableData.push(rowData);
-            });
+          // Extract table data from the HTML table
+          const tableData = [];
+          const rows = document.querySelectorAll('#tableBody tr');
+          rows.forEach(row => {
+              const rowData = [];
+              row.querySelectorAll('td').forEach(cell => {
+                  rowData.push(cell.textContent);
+              });
+              tableData.push(rowData);
+          });
 
-            // Add table to the PDF
-            pdf.autoTable({
-                head: [['Sl No', 'Medicine Name', 'Batch No', 'Expiry Date', 'Unit Price', 'Rate', 'Quantity', 'Total Amount']],
-                body: tableData,
-                startY: 80,
-                margin: { top: 80 }, // Set the margin
-            });
+          // Add the typed medicine name to the table data
+          const typedMedicineName = document.querySelector('#tableBody tr:first-child td:nth-child(2) input').value.trim();
+          tableData[0][1] = typedMedicineName; // Replace the medicine name in the first row of table data
 
+          // Add table to the PDF
+          pdf.autoTable({
+              head: [['Sl No', 'Medicine Name', 'Batch No', 'Expiry Date', 'Unit Price', 'Rate', 'Quantity', 'Total Amount']],
+              body: tableData,
+              startY: 80,
+              margin: { top: 80 }, // Set the margin
+          });
 
-            // Calculate total amount
-            let totalAmount = 0;
-            tableData.forEach(row => {
-                const amount = parseFloat(row[7]);
-                if (!isNaN(amount)) {
-                    totalAmount += amount;
-                }
-            });
+          // Calculate total amount
+          let totalAmount = 0;
+          tableData.forEach(row => {
+              const amount = parseFloat(row[7]);
+              if (!isNaN(amount)) {
+                  totalAmount += amount;
+              }
+          });
 
-            // Display total amount to be paid
-            document.getElementById('totalToPay').textContent = totalAmount.toFixed(2);
+          // Display total amount to be paid
+          document.getElementById('totalToPay').textContent = totalAmount.toFixed(2);
 
-            // Add total amount to the PDF
-            pdf.text(`Total Amount: ${totalAmount.toFixed(2)}`, 20, pdf.lastAutoTable.finalY + 10);
+          // Add total amount to the PDF
+          pdf.text(`Total Amount: ${totalAmount.toFixed(2)}`, 20, pdf.lastAutoTable.finalY + 10);
 
-            // Save the PDF
-            pdf.save('receipt.pdf');
-        }
+          // Save the PDF
+          pdf.save('receipt.pdf');
+      }
         window.addEventListener('DOMContentLoaded', addRow);
       </script>
     </table>
