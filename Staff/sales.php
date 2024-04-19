@@ -316,13 +316,13 @@
               cell.contentEditable = true;
 
               if (j === 1) {
-                  const inputField = document.createElement('input');
-                  inputField.type = 'text';
-                  inputField.placeholder = 'Enter Product Name';
-                  inputField.addEventListener('input', function () {
-                      liveSearch(this);
-                  });
-                  cell.appendChild(inputField);
+                const inputField = document.createElement('input');
+                inputField.type = 'text';
+                inputField.placeholder = 'Enter Product Name';
+                inputField.addEventListener('input', function () {
+                    liveSearch(this);
+                });
+                cell.appendChild(inputField);
               }
 
               if (j === 6) {
@@ -412,7 +412,9 @@
                 head: [['Sl No', 'Medicine Name', 'Batch No', 'Expiry Date', 'Unit Price', 'Rate', 'Quantity', 'Total Amount']],
                 body: tableData,
                 startY: 80,
+                margin: { top: 80 }, // Set the margin
             });
+
 
             // Calculate total amount
             let totalAmount = 0;
